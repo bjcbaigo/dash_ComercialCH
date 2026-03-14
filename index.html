@@ -30,6 +30,7 @@
   --sans:'Inter',sans-serif;
   --mono:'JetBrains Mono',monospace;
 }
+
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
 body{min-height:100vh}
@@ -56,6 +57,7 @@ body{min-height:100vh}
   gap:12px;
   margin-bottom:18px;
 }
+
 .logo{
   width:44px;
   height:44px;
@@ -65,11 +67,14 @@ body{min-height:100vh}
   display:grid;
   place-items:center;
   font-weight:800;
+  flex:0 0 auto;
 }
+
 .brand h1{
   margin:0;
   font-size:1.05rem;
 }
+
 .brand small{
   color:var(--muted);
 }
@@ -79,6 +84,7 @@ body{min-height:100vh}
   gap:8px;
   margin-bottom:18px;
 }
+
 .nav button{
   width:100%;
   text-align:left;
@@ -91,10 +97,12 @@ body{min-height:100vh}
   font-weight:700;
   cursor:pointer;
 }
+
 .nav button:hover{
   border-color:#bfd0dc;
   background:#f9fcfe;
 }
+
 .nav button.active{
   background:linear-gradient(180deg,#eef8fb,#f8fcfe);
   color:var(--primary);
@@ -107,13 +115,19 @@ body{min-height:100vh}
   border-radius:var(--radius);
   box-shadow:var(--shadow);
 }
+
 .panel.pad{padding:14px}
+
 .panel h3{
   margin:0 0 12px 0;
   font-size:.95rem;
 }
 
-.field{margin-bottom:10px}
+.field{
+  margin-bottom:10px;
+  min-width:0;
+}
+
 .field label{
   display:block;
   margin-bottom:6px;
@@ -123,8 +137,12 @@ body{min-height:100vh}
   text-transform:uppercase;
   letter-spacing:.03em;
 }
-.field input,.field select{
+
+.field input,
+.field select{
   width:100%;
+  max-width:100%;
+  min-width:0;
   padding:11px 12px;
   border:1px solid var(--line);
   border-radius:10px;
@@ -132,22 +150,32 @@ body{min-height:100vh}
   color:var(--text);
   font:inherit;
 }
-.field input:focus,.field select:focus{
+
+.field input:focus,
+.field select:focus{
   outline:none;
   border-color:#9ac8d6;
   box-shadow:0 0 0 3px rgba(47,142,168,.10);
 }
+
 .grid2{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
+  min-width:0;
 }
+
+.grid2 > *{
+  min-width:0;
+}
+
 .btns{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
   margin-top:10px;
 }
+
 .btn{
   padding:11px 12px;
   border-radius:10px;
@@ -158,19 +186,24 @@ body{min-height:100vh}
   font-weight:800;
   cursor:pointer;
 }
+
 .btn:hover{background:#f8fbfd}
+
 .btn.primary{
   background:var(--primary);
   border-color:var(--primary);
   color:#fff;
 }
+
 .btn.primary:hover{filter:brightness(.98)}
+
 .mini{
   margin-top:10px;
   color:var(--muted);
   font-size:.78rem;
   line-height:1.5;
 }
+
 .mono{font-family:var(--mono)}
 
 .main{
@@ -185,19 +218,23 @@ body{min-height:100vh}
   flex-wrap:wrap;
   margin-bottom:16px;
 }
+
 .title h2{
   margin:0 0 4px 0;
   font-size:1.9rem;
 }
+
 .title small{
   color:var(--muted);
   font-size:.95rem;
 }
+
 .status{
   display:flex;
   flex-wrap:wrap;
   gap:8px;
 }
+
 .tag{
   padding:8px 12px;
   border-radius:999px;
@@ -206,6 +243,7 @@ body{min-height:100vh}
   color:var(--muted);
   font-size:.78rem;
 }
+
 .tag strong{color:var(--primary)}
 
 .banner{
@@ -216,12 +254,14 @@ body{min-height:100vh}
   border:1px solid var(--line);
   background:#fff;
 }
+
 .banner.error{
   display:block;
   color:#8a2f2f;
   background:#fff3f3;
   border-color:#f0c5c5;
 }
+
 .banner.ok{
   display:block;
   color:#176942;
@@ -235,6 +275,7 @@ body{min-height:100vh}
   gap:14px;
   margin-bottom:16px;
 }
+
 .kpi{
   background:#fff;
   border:1px solid var(--line);
@@ -243,6 +284,7 @@ body{min-height:100vh}
   padding:16px;
   position:relative;
 }
+
 .kpi::before{
   content:"";
   position:absolute;
@@ -252,10 +294,12 @@ body{min-height:100vh}
   height:4px;
   border-radius:14px 14px 0 0;
 }
+
 .k1::before{background:#55bfd9}
 .k2::before{background:#3a7fc2}
 .k3::before{background:#d28b12}
 .k4::before{background:#1f9d62}
+
 .kpi .lbl{
   font-size:.75rem;
   color:var(--muted);
@@ -263,6 +307,7 @@ body{min-height:100vh}
   text-transform:uppercase;
   letter-spacing:.03em;
 }
+
 .kpi .val{
   margin-top:10px;
   font-size:1.7rem;
@@ -270,6 +315,7 @@ body{min-height:100vh}
   color:var(--primary);
   font-family:var(--mono);
 }
+
 .kpi .sub{
   margin-top:8px;
   color:var(--muted);
@@ -284,6 +330,7 @@ body{min-height:100vh}
   gap:14px;
   margin-bottom:14px;
 }
+
 .r2{grid-template-columns:1.45fr 1fr}
 .r2e{grid-template-columns:1fr 1fr}
 
@@ -293,6 +340,7 @@ body{min-height:100vh}
   border-radius:var(--radius);
   box-shadow:var(--shadow);
 }
+
 .head{
   display:flex;
   align-items:center;
@@ -302,31 +350,38 @@ body{min-height:100vh}
   padding:14px 16px;
   border-bottom:1px solid var(--line-2);
 }
+
 .head h3{
   margin:0;
   font-size:1rem;
 }
+
 .head small{
   color:var(--muted);
 }
+
 .body{
   padding:14px 16px;
 }
+
 .chart{height:320px}
 .chart.sm{height:220px}
 .chart.lg{height:430px}
 
 .tableWrap{overflow:auto}
+
 .tbl{
   width:100%;
   border-collapse:collapse;
   min-width:920px;
 }
+
 .tbl th,.tbl td{
   padding:10px 12px;
   border-bottom:1px solid var(--line-2);
   font-size:.83rem;
 }
+
 .tbl th{
   background:#f8fbfd;
   color:var(--muted);
@@ -337,6 +392,7 @@ body{min-height:100vh}
   position:sticky;
   top:0;
 }
+
 .tbl td.r,.tbl th.r{text-align:right}
 .tbl tbody tr:hover{background:#f9fcfe}
 
@@ -344,18 +400,21 @@ body{min-height:100vh}
   display:grid;
   gap:10px;
 }
+
 .item{
   padding:12px;
   border:1px solid var(--line);
   border-radius:12px;
   background:#fbfdfe;
 }
+
 .itemTop{
   display:flex;
   justify-content:space-between;
   gap:10px;
   align-items:center;
 }
+
 .bar{
   height:8px;
   background:#dce8ef;
@@ -363,11 +422,13 @@ body{min-height:100vh}
   overflow:hidden;
   margin-top:10px;
 }
+
 .fill{
   height:100%;
   border-radius:999px;
   background:linear-gradient(90deg,var(--primary),var(--primary-2));
 }
+
 .meta{
   margin-top:8px;
   color:var(--muted);
@@ -383,6 +444,7 @@ body{min-height:100vh}
   font-size:.74rem;
   font-weight:800;
 }
+
 .ok{color:#176942;background:#edf9f3;border-color:#c7ead7}
 .mid{color:#8b5c00;background:#fff7e7;border-color:#f2ddb1}
 .bad{color:#9a2b2b;background:#fff3f3;border-color:#efc7c7}
@@ -395,35 +457,193 @@ body{min-height:100vh}
   line-height:1.5;
 }
 
+.mobileTopbar,
+.mobileOverlay,
+.sideMobileHead,
+.mobileMenuBtn,
+.sideCloseBtn{
+  display:none;
+}
+
 @media (max-width:1200px){
-  .app{grid-template-columns:1fr}
-  .side{
-    position:relative;
-    height:auto;
-    border-right:none;
-    border-bottom:1px solid var(--line);
-  }
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .r2,.r2e{grid-template-columns:1fr}
 }
+
 @media (max-width:760px){
-  .main{padding:14px}
-  .kpis{grid-template-columns:1fr}
-  .grid2,.btns{grid-template-columns:1fr}
-  .chart{height:280px}
-  .chart.lg{height:340px}
+  .app{
+    display:block;
+  }
+
+  .mobileTopbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    position:sticky;
+    top:0;
+    z-index:1100;
+    background:#ffffff;
+    border-bottom:1px solid var(--line);
+    padding:10px 14px;
+    box-shadow:0 4px 14px rgba(20,55,90,.06);
+  }
+
+  .mobileBrand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+
+  .mobileBrand .logo{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    flex:0 0 auto;
+  }
+
+  .mobileBrand strong{
+    display:block;
+    font-size:.98rem;
+    color:var(--text);
+    line-height:1.1;
+  }
+
+  .mobileBrand small{
+    display:block;
+    font-size:.76rem;
+    color:var(--muted);
+    line-height:1.1;
+    margin-top:2px;
+  }
+
+  .mobileMenuBtn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:42px;
+    height:42px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--text);
+    font-size:1.2rem;
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+
+  .mobileOverlay{
+    position:fixed;
+    inset:0;
+    background:rgba(17,31,44,.38);
+    z-index:1190;
+  }
+
+  .mobileOverlay.show{
+    display:block;
+  }
+
+  .side{
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    width:min(88vw, 340px);
+    height:100vh;
+    z-index:1200;
+    transform:translateX(-105%);
+    transition:transform .24s ease;
+    overflow:auto;
+    border-right:1px solid var(--line);
+    border-bottom:none;
+    box-shadow:0 18px 40px rgba(0,0,0,.20);
+    padding:16px;
+  }
+
+  .side.open{
+    transform:translateX(0);
+  }
+
+  .sideMobileHead{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+  }
+
+  .sideMobileHead .brand{
+    margin-bottom:0;
+    flex:1 1 auto;
+  }
+
+  .sideCloseBtn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--text);
+    font-size:1rem;
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+
+  .main{
+    padding:14px;
+  }
+
+  .kpis{
+    grid-template-columns:1fr;
+  }
+
+  .grid2{
+    grid-template-columns:1fr;
+  }
+
+  .btns{
+    grid-template-columns:1fr;
+  }
+
+  .chart{
+    height:260px;
+  }
+
+  .chart.lg{
+    height:320px;
+  }
 }
 </style>
 </head>
 <body>
+<div class="mobileTopbar">
+  <div class="mobileBrand">
+    <div class="logo">CH</div>
+    <div>
+      <strong>CHEMES Comercial</strong>
+      <small>Tablero modular profesional</small>
+    </div>
+  </div>
+  <button class="mobileMenuBtn" id="mobileMenuBtn" aria-label="Abrir menú">☰</button>
+</div>
+
+<div class="mobileOverlay" id="mobileOverlay"></div>
+
 <div class="app">
-  <aside class="side">
-    <div class="brand">
-      <div class="logo">CH</div>
-      <div>
-        <h1>CHEMES Comercial</h1>
-        <small>Tablero modular profesional</small>
+  <aside class="side" id="sidebar">
+    <div class="sideMobileHead">
+      <div class="brand">
+        <div class="logo">CH</div>
+        <div>
+          <h1>CHEMES Comercial</h1>
+          <small>Tablero modular profesional</small>
+        </div>
       </div>
+      <button class="sideCloseBtn" id="sideCloseBtn" aria-label="Cerrar menú">✕</button>
     </div>
 
     <nav class="nav">
@@ -487,8 +707,8 @@ body{min-height:100vh}
 
       <div class="mini" id="filtrosTexto">Sin filtros activos.</div>
       <div class="mini">
-        Backend conservado: Apps Script v2 actual.  
-        Esta versión evita cargar universos enormes en pantalla y prioriza ranking, top y alertas.
+        Backend conservado: Apps Script v3.  
+        Esta versión prioriza lectura ejecutiva y evita abusar de endpoints pesados en pantalla.
       </div>
     </div>
   </aside>
@@ -501,7 +721,7 @@ body{min-height:100vh}
       </div>
       <div class="status">
         <div class="tag">Modelo <strong>modular</strong></div>
-        <div class="tag">Backend <strong>Apps Script v2</strong></div>
+        <div class="tag">Backend <strong>Apps Script v3</strong></div>
         <div class="tag">Modo <strong id="modoTag">detectando</strong></div>
         <div class="tag">Estado <strong id="healthTag">sin verificar</strong></div>
       </div>
@@ -557,7 +777,7 @@ body{min-height:100vh}
             <div class="chart sm"><canvas id="chMix"></canvas></div>
             <div class="footerNote">
               Seguros CHEMES toma AS0015 P112 / P212 / P312.  
-              Esta vista usa agregados y evita sobrecargar la interfaz con detalle innecesario.
+              La vista prioriza agregados y evita sobrecargar la interfaz con detalle innecesario.
             </div>
           </div>
         </article>
@@ -781,12 +1001,14 @@ body{min-height:100vh}
     resumen: null,
     vendedores: [],
     productos: [],
+    sucursalesAgg: [],
     health: null
   };
 
   function fmtMoney(v){
     return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v || 0));
   }
+
   function fmtShort(v){
     const n = Number(v || 0), a = Math.abs(n);
     if (a >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
@@ -794,13 +1016,16 @@ body{min-height:100vh}
     if (a >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
     return fmtMoney(n);
   }
+
   function fmtNum(v){
     return new Intl.NumberFormat('es-AR').format(Number(v || 0));
   }
+
   function fmtPct(v,d=1){
     const n = Number(v || 0);
     return Number.isFinite(n) ? n.toFixed(d) + '%' : '0%';
   }
+
   function esc(s){
     return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
@@ -811,6 +1036,7 @@ body{min-height:100vh}
     if (objPct >= 85) return '<span class="badge mid">Atención</span>';
     return '<span class="badge bad">Bajo</span>';
   }
+
   function badgeStock(r){
     if ((r.flag_quiebre || 0) === 1) return '<span class="badge bad">Quiebre</span>';
     if (r.cobertura_dias != null && Number(r.cobertura_dias) <= 7) return '<span class="badge mid">Crítico</span>';
@@ -820,6 +1046,7 @@ body{min-height:100vh}
   function normVendorName(v){
     return String(v || '').trim().replace(/\s+/g,' ');
   }
+
   function isAllowedVendor(v){
     const n = normVendorName(v);
     if (!n) return false;
@@ -828,6 +1055,7 @@ body{min-height:100vh}
     if (EXCLUDED_VENDEDORES_CONTAINS.some(x => upper.includes(x))) return false;
     return true;
   }
+
   function cleanVendorList(arr){
     return [...new Set((arr || []).map(normVendorName).filter(isAllowedVendor))].sort((a,b)=>a.localeCompare(b,'es'));
   }
@@ -837,6 +1065,7 @@ body{min-height:100vh}
     b.className = 'banner ' + type;
     b.textContent = msg;
   }
+
   function clearBanner(){
     const b = $('#banner');
     b.className = 'banner';
@@ -845,7 +1074,7 @@ body{min-height:100vh}
 
   function getDateRange(period){
     const today = new Date();
-    const iso = d => new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+    const iso = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
     let desde = null, hasta = iso(today);
 
     if(period === 'hoy'){
@@ -867,6 +1096,7 @@ body{min-height:100vh}
       d.setDate(d.getDate()-89);
       desde = iso(d);
     }
+
     return {desde, hasta};
   }
 
@@ -912,6 +1142,7 @@ body{min-height:100vh}
         reject(new Error('Falta configurar la URL del Web App de Apps Script.'));
         return;
       }
+
       const cb = '__chemes_cb_' + Math.random().toString(36).slice(2);
       params.callback = cb;
       const qs = new URLSearchParams(params);
@@ -1009,13 +1240,13 @@ body{min-height:100vh}
   function renderResumen(){
     const rows = state.ventasDetalle || [];
     const series = buildSeries(rows);
-    const topSuc = buildSucursalAgg(rows).slice(0,6);
+    const topSuc = (state.sucursalesAgg && state.sucursalesAgg.length ? state.sucursalesAgg : buildSucursalAgg(rows)).slice(0,6);
     const topVen = (state.vendedores || []).slice(0,6);
 
     $('#topSucursales').innerHTML = topSuc.length ? topSuc.map(r => `
       <div class="item">
         <div class="itemTop"><strong>${esc(r.sucursal)}</strong><span>${fmtShort(r.ventas)}</span></div>
-        <div class="bar"><div class="fill" style="width:${Math.min(100, Math.max(8, r.polizas_vs_venta_pct * 10 + 10))}%"></div></div>
+        <div class="bar"><div class="fill" style="width:${Math.min(100, Math.max(8, (r.polizas_vs_venta_pct || 0) * 10 + 10))}%"></div></div>
         <div class="meta">Comprobantes ${fmtNum(r.comprobantes)} · Garantías ${fmtShort(r.garantias_importe)} · Ticket ${fmtMoney(r.ticket)}</div>
       </div>`).join('') : '<div class="item"><div class="meta">Sin datos para el filtro aplicado.</div></div>';
 
@@ -1071,7 +1302,7 @@ body{min-height:100vh}
   }
 
   function renderSucursales(){
-    const data = buildSucursalAgg(state.ventasDetalle || []);
+    const data = state.sucursalesAgg && state.sucursalesAgg.length ? state.sucursalesAgg : buildSucursalAgg(state.ventasDetalle || []);
     $('#tbSucursales').innerHTML = data.length ? data.map(r => `
       <tr>
         <td>${esc(r.sucursal)}</td>
@@ -1178,7 +1409,6 @@ body{min-height:100vh}
       .filter(r => r.cobertura_dias != null)
       .sort((a,b)=>(a.cobertura_dias ?? 999999) - (b.cobertura_dias ?? 999999))
       .slice(0,6);
-
     const insightRows = (quiebre.length ? quiebre : cobertura).slice(0,6);
 
     $('#insightsProductos').innerHTML = insightRows.length ? insightRows.map(r => `
@@ -1191,18 +1421,18 @@ body{min-height:100vh}
   function renderArquitectura(){
     $('#circuitoBox').innerHTML = [
       ['1. Origen', 'CSV de ventas, ranking, ticket y stock publicados al backend actual.'],
-      ['2. Apps Script v2', 'Se conserva sin cambios estructurales.'],
-      ['3. Frontend profesional', 'Lee resumen, ventas, vendedores y productos sin alterar la lógica servidor.'],
+      ['2. Apps Script v3', 'Se conserva la base y se agregan endpoints más agregados.'],
+      ['3. Frontend profesional', 'Lee resumen, sucursales, ventas, vendedores y productos sin romper la lógica servidor.'],
       ['4. Criterio', 'La vista prioriza tableros ejecutivos y alertas, no datasets crudos completos.'],
-      ['5. Escala', 'Se puede crecer con nuevos endpoints agregados más adelante, sin rehacer el front.']
+      ['5. Escala', 'Se puede crecer con nuevos agregados más adelante, sin rehacer el frente.']
     ].map(([t,d]) => `<div class="item"><div class="itemTop"><strong>${t}</strong></div><div class="meta">${d}</div></div>`).join('');
 
     $('#escalaBox').innerHTML = [
-      'Observación válida: productos puede tener universos muy grandes. Esta versión usa top y alertas, no detalle masivo irrestricto.',
+      'Observación válida: productos puede tener universos muy grandes. Esta versión usa top y alertas, no detalle irrestricto.',
       'Ventas se pide con límite. Si el período es muy amplio, conviene resumir más y no pretender detalle completo en pantalla.',
-      'Para una etapa siguiente, lo ideal es sumar endpoints agregados: sucursales, productos_top, productos_quiebre.',
-      'Mientras tanto, este front mantiene el backend actual y evita cargar datos innecesarios en exceso.',
-      'Conclusión: hoy el cuello potencial no es visual sino el volumen de filas. Esta versión lo administra mejor.'
+      'La v3 habilita endpoints agregados como sucursales, productos_top y productos_quiebre.',
+      'Mientras tanto, este front administra mejor el volumen y evita sobrecargar la experiencia de uso.',
+      'Conclusión: hoy el cuello potencial es el volumen de filas. El diseño y el consumo se adaptaron a esa realidad.'
     ].map(t => `<div class="item"><div class="meta">${t}</div></div>`).join('');
   }
 
@@ -1218,8 +1448,8 @@ body{min-height:100vh}
     const currentSuc = tenantSucursal || sucSel.value;
     const currentVen = normVendorName(venSel.value);
 
-    sucSel.innerHTML = '<option value="">Todas</option>' + (state.lookups.sucursales || []).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-    venSel.innerHTML = '<option value="">Todos</option>' + state.lookups.vendedores.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    sucSel.innerHTML = '<option value="">Todas</option>' + (state.lookups.sucursales || []).map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    venSel.innerHTML = '<option value="">Todos</option>' + state.lookups.vendedores.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
 
     if(currentSuc) sucSel.value = currentSuc;
     if(currentVen && state.lookups.vendedores.includes(currentVen)) venSel.value = currentVen;
@@ -1263,14 +1493,18 @@ body{min-height:100vh}
       const resumenParams = {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, vendedor:f.vendedor};
       if (f.objetivo != null) resumenParams.objetivo = f.objetivo;
 
-      const [resumen, ventas, vendedores, productos] = await Promise.all([
+      const [resumen, sucursales, ventas, vendedores, productos] = await Promise.all([
         api('resumen', resumenParams),
-        api('ventas', {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, vendedor:f.vendedor, q:f.qProducto, limit:15000}),
+        api('sucursales', {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, vendedor:f.vendedor, limit:100}),
+        api('ventas', {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, vendedor:f.vendedor, q:f.qProducto, limit:12000}),
         api('vendedores', {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, q:f.vendedor, ordenar:'ventas', limit:200}),
-        api('productos', {sucursal:f.sucursal, q:f.qProducto, soloQuiebre:f.soloQuiebre, ordenar:'importe', limit:120})
+        f.soloQuiebre
+          ? api('productos_quiebre', {sucursal:f.sucursal, q:f.qProducto, limit:120})
+          : api('productos_top', {sucursal:f.sucursal, q:f.qProducto, ordenar:'importe', limit:120})
       ]);
 
       state.resumen = resumen;
+      state.sucursalesAgg = sucursales.data || [];
       state.ventasDetalle = ventas.data || [];
       state.vendedores = (vendedores.data || []).filter(r => isAllowedVendor(r.vendedor));
       state.productos = productos.data || [];
@@ -1283,7 +1517,7 @@ body{min-height:100vh}
       renderArquitectura();
 
       if(ventas.truncated){
-        setBanner('La vista de ventas fue truncada por límite. El tablero sigue funcionando, pero para análisis muy amplios conviene sumar endpoints agregados.', 'error');
+        setBanner('La vista de ventas fue truncada por límite. El tablero sigue funcionando, pero para análisis muy amplios conviene resumir más.', 'error');
       } else if(state.health && state.health.error === false){
         setBanner('Datos actualizados correctamente.', 'ok');
       }
@@ -1291,6 +1525,44 @@ body{min-height:100vh}
       setBanner(err.message || 'No se pudo actualizar el tablero.', 'error');
       console.error(err);
     }
+  }
+
+  function closeMobileSidebar(){
+    const sidebar = $('#sidebar');
+    const overlay = $('#mobileOverlay');
+    if(sidebar) sidebar.classList.remove('open');
+    if(overlay) overlay.classList.remove('show');
+  }
+
+  function openMobileSidebar(){
+    const sidebar = $('#sidebar');
+    const overlay = $('#mobileOverlay');
+    if(sidebar) sidebar.classList.add('open');
+    if(overlay) overlay.classList.add('show');
+  }
+
+  function wireMobileDrawer(){
+    const btnOpen = $('#mobileMenuBtn');
+    const btnClose = $('#sideCloseBtn');
+    const overlay = $('#mobileOverlay');
+
+    if(btnOpen){
+      btnOpen.addEventListener('click', openMobileSidebar);
+    }
+
+    if(btnClose){
+      btnClose.addEventListener('click', closeMobileSidebar);
+    }
+
+    if(overlay){
+      overlay.addEventListener('click', closeMobileSidebar);
+    }
+
+    window.addEventListener('resize', () => {
+      if(window.innerWidth > 760){
+        closeMobileSidebar();
+      }
+    });
   }
 
   function wireViews(){
@@ -1310,15 +1582,24 @@ body{min-height:100vh}
       $('#pageTitle').textContent = meta[btn.dataset.view][0];
       $('#pageDesc').textContent = meta[btn.dataset.view][1];
       state.currentView = btn.dataset.view;
+
+      if(window.innerWidth <= 760){
+        closeMobileSidebar();
+      }
     }));
   }
 
   function wireFilters(){
     $('#periodo').addEventListener('change', syncDatesByPeriod);
+
     $('#btnAplicar').addEventListener('click', async () => {
       await loadLookups();
       await refreshAll();
+      if(window.innerWidth <= 760){
+        closeMobileSidebar();
+      }
     });
+
     $('#btnLimpiar').addEventListener('click', async () => {
       $('#periodo').value = 'mes';
       syncDatesByPeriod();
@@ -1331,13 +1612,18 @@ body{min-height:100vh}
       updateFilterText();
       await loadLookups();
       await refreshAll();
+      if(window.innerWidth <= 760){
+        closeMobileSidebar();
+      }
     });
+
     $('#soloQuiebre').addEventListener('change', refreshAll);
   }
 
   async function init(){
     wireViews();
     wireFilters();
+    wireMobileDrawer();
     syncDatesByPeriod();
     updateFilterText();
 
