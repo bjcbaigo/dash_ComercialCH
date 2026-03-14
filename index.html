@@ -165,7 +165,8 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 
 <script>
 (() => {
-  const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec";
+  const DEFAULT_API_URL =
+"https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec";
   const paramsUrl = new URLSearchParams(location.search);
   const API_URL = (window.CHEMES_API_URL || paramsUrl.get('apiUrl') || DEFAULT_API_URL).trim();
   const tenantSucursal = (paramsUrl.get('suc') || '').trim();
