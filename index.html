@@ -1,1649 +1,716 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CHEMES | Dashboard Comercial</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<style>
-:root{
-  --bg:#f3f7fa;
-  --surface:#ffffff;
-  --surface-2:#f8fbfd;
-  --line:#d7e2ea;
-  --line-2:#e7eef3;
-  --text:#244055;
-  --muted:#6f8898;
-
-  --primary:#2f8ea8;
-  --primary-2:#53abc1;
-  --success:#1f9d62;
-  --warn:#d28b12;
-  --danger:#d94b4b;
-  --info:#3a7fc2;
-
-  --shadow:0 8px 24px rgba(20,55,90,.08);
-  --radius:14px;
-  --radius-sm:10px;
-
-  --sans:'Inter',sans-serif;
-  --mono:'JetBrains Mono',monospace;
-}
-
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
-body{min-height:100vh}
-
-.app{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  min-height:100vh;
-}
-
-.side{
-  background:var(--surface);
-  border-right:1px solid var(--line);
-  padding:18px;
-  position:sticky;
-  top:0;
-  height:100vh;
-  overflow:auto;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-bottom:18px;
-}
-
-.logo{
-  width:44px;
-  height:44px;
-  border-radius:12px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-2));
-  color:#fff;
-  display:grid;
-  place-items:center;
-  font-weight:800;
-  flex:0 0 auto;
-}
-
-.brand h1{
-  margin:0;
-  font-size:1.05rem;
-}
-
-.brand small{
-  color:var(--muted);
-}
-
-.nav{
-  display:grid;
-  gap:8px;
-  margin-bottom:18px;
-}
-
-.nav button{
-  width:100%;
-  text-align:left;
-  padding:12px 14px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:#fff;
-  color:var(--muted);
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.nav button:hover{
-  border-color:#bfd0dc;
-  background:#f9fcfe;
-}
-
-.nav button.active{
-  background:linear-gradient(180deg,#eef8fb,#f8fcfe);
-  color:var(--primary);
-  border-color:#b9d7e1;
-}
-
-.panel{
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-}
-
-.panel.pad{padding:14px}
-
-.panel h3{
-  margin:0 0 12px 0;
-  font-size:.95rem;
-}
-
-.field{
-  margin-bottom:10px;
-  min-width:0;
-}
-
-.field label{
-  display:block;
-  margin-bottom:6px;
-  font-size:.74rem;
-  font-weight:700;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:.03em;
-}
-
-.field input,
-.field select{
-  width:100%;
-  max-width:100%;
-  min-width:0;
-  padding:11px 12px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#fff;
-  color:var(--text);
-  font:inherit;
-}
-
-.field input:focus,
-.field select:focus{
-  outline:none;
-  border-color:#9ac8d6;
-  box-shadow:0 0 0 3px rgba(47,142,168,.10);
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  min-width:0;
-}
-
-.grid2 > *{
-  min-width:0;
-}
-
-.btns{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-
-.btn{
-  padding:11px 12px;
-  border-radius:10px;
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--text);
-  font:inherit;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.btn:hover{background:#f8fbfd}
-
-.btn.primary{
-  background:var(--primary);
-  border-color:var(--primary);
-  color:#fff;
-}
-
-.btn.primary:hover{filter:brightness(.98)}
-
-.mini{
-  margin-top:10px;
-  color:var(--muted);
-  font-size:.78rem;
-  line-height:1.5;
-}
-
-.mono{font-family:var(--mono)}
-
-.main{
-  padding:22px;
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:14px;
-  flex-wrap:wrap;
-  margin-bottom:16px;
-}
-
-.title h2{
-  margin:0 0 4px 0;
-  font-size:1.9rem;
-}
-
-.title small{
-  color:var(--muted);
-  font-size:.95rem;
-}
-
-.status{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.tag{
-  padding:8px 12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--muted);
-  font-size:.78rem;
-}
-
-.tag strong{color:var(--primary)}
-
-.banner{
-  display:none;
-  padding:12px 14px;
-  border-radius:12px;
-  margin-bottom:14px;
-  border:1px solid var(--line);
-  background:#fff;
-}
-
-.banner.error{
-  display:block;
-  color:#8a2f2f;
-  background:#fff3f3;
-  border-color:#f0c5c5;
-}
-
-.banner.ok{
-  display:block;
-  color:#176942;
-  background:#edf9f3;
-  border-color:#c7ead7;
-}
-
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-  margin-bottom:16px;
-}
-
-.kpi{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:16px;
-  position:relative;
-}
-
-.kpi::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:4px;
-  border-radius:14px 14px 0 0;
-}
-
-.k1::before{background:#55bfd9}
-.k2::before{background:#3a7fc2}
-.k3::before{background:#d28b12}
-.k4::before{background:#1f9d62}
-
-.kpi .lbl{
-  font-size:.75rem;
-  color:var(--muted);
-  font-weight:800;
-  text-transform:uppercase;
-  letter-spacing:.03em;
-}
-
-.kpi .val{
-  margin-top:10px;
-  font-size:1.7rem;
-  font-weight:800;
-  color:var(--primary);
-  font-family:var(--mono);
-}
-
-.kpi .sub{
-  margin-top:8px;
-  color:var(--muted);
-  font-size:.82rem;
-}
-
-.view{display:none}
-.view.active{display:block}
-
-.row{
-  display:grid;
-  gap:14px;
-  margin-bottom:14px;
-}
-
-.r2{grid-template-columns:1.45fr 1fr}
-.r2e{grid-template-columns:1fr 1fr}
-
-.card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-}
-
-.head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-  padding:14px 16px;
-  border-bottom:1px solid var(--line-2);
-}
-
-.head h3{
-  margin:0;
-  font-size:1rem;
-}
-
-.head small{
-  color:var(--muted);
-}
-
-.body{
-  padding:14px 16px;
-}
-
-.chart{height:320px}
-.chart.sm{height:220px}
-.chart.lg{height:430px}
-
-.tableWrap{overflow:auto}
-
-.tbl{
-  width:100%;
-  border-collapse:collapse;
-  min-width:920px;
-}
-
-.tbl th,.tbl td{
-  padding:10px 12px;
-  border-bottom:1px solid var(--line-2);
-  font-size:.83rem;
-}
-
-.tbl th{
-  background:#f8fbfd;
-  color:var(--muted);
-  text-transform:uppercase;
-  font-size:.69rem;
-  letter-spacing:.04em;
-  text-align:left;
-  position:sticky;
-  top:0;
-}
-
-.tbl td.r,.tbl th.r{text-align:right}
-.tbl tbody tr:hover{background:#f9fcfe}
-
-.list{
-  display:grid;
-  gap:10px;
-}
-
-.item{
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:#fbfdfe;
-}
-
-.itemTop{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:center;
-}
-
-.bar{
-  height:8px;
-  background:#dce8ef;
-  border-radius:999px;
-  overflow:hidden;
-  margin-top:10px;
-}
-
-.fill{
-  height:100%;
-  border-radius:999px;
-  background:linear-gradient(90deg,var(--primary),var(--primary-2));
-}
-
-.meta{
-  margin-top:8px;
-  color:var(--muted);
-  font-size:.79rem;
-}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid transparent;
-  font-size:.74rem;
-  font-weight:800;
-}
-
-.ok{color:#176942;background:#edf9f3;border-color:#c7ead7}
-.mid{color:#8b5c00;background:#fff7e7;border-color:#f2ddb1}
-.bad{color:#9a2b2b;background:#fff3f3;border-color:#efc7c7}
-.info{color:#285d97;background:#eef5fc;border-color:#cfe0f3}
-
-.footerNote{
-  margin-top:12px;
-  color:var(--muted);
-  font-size:.79rem;
-  line-height:1.5;
-}
-
-.mobileTopbar,
-.mobileOverlay,
-.sideMobileHead,
-.mobileMenuBtn,
-.sideCloseBtn{
-  display:none;
-}
-
-@media (max-width:1200px){
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .r2,.r2e{grid-template-columns:1fr}
-}
-
-@media (max-width:760px){
-  .app{
-    display:block;
-  }
-
-  .mobileTopbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    position:sticky;
-    top:0;
-    z-index:1100;
-    background:#ffffff;
-    border-bottom:1px solid var(--line);
-    padding:10px 14px;
-    box-shadow:0 4px 14px rgba(20,55,90,.06);
-  }
-
-  .mobileBrand{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    min-width:0;
-  }
-
-  .mobileBrand .logo{
-    width:38px;
-    height:38px;
-    border-radius:10px;
-    flex:0 0 auto;
-  }
-
-  .mobileBrand strong{
-    display:block;
-    font-size:.98rem;
-    color:var(--text);
-    line-height:1.1;
-  }
-
-  .mobileBrand small{
-    display:block;
-    font-size:.76rem;
-    color:var(--muted);
-    line-height:1.1;
-    margin-top:2px;
-  }
-
-  .mobileMenuBtn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:42px;
-    height:42px;
-    border:1px solid var(--line);
-    border-radius:10px;
-    background:#fff;
-    color:var(--text);
-    font-size:1.2rem;
-    cursor:pointer;
-    flex:0 0 auto;
-  }
-
-  .mobileOverlay{
-    position:fixed;
-    inset:0;
-    background:rgba(17,31,44,.38);
-    z-index:1190;
-  }
-
-  .mobileOverlay.show{
-    display:block;
-  }
-
-  .side{
-    position:fixed;
-    top:0;
-    left:0;
-    bottom:0;
-    width:min(88vw, 340px);
-    height:100vh;
-    z-index:1200;
-    transform:translateX(-105%);
-    transition:transform .24s ease;
-    overflow:auto;
-    border-right:1px solid var(--line);
-    border-bottom:none;
-    box-shadow:0 18px 40px rgba(0,0,0,.20);
-    padding:16px;
-  }
-
-  .side.open{
-    transform:translateX(0);
-  }
-
-  .sideMobileHead{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:14px;
-  }
-
-  .sideMobileHead .brand{
-    margin-bottom:0;
-    flex:1 1 auto;
-  }
-
-  .sideCloseBtn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:40px;
-    height:40px;
-    border:1px solid var(--line);
-    border-radius:10px;
-    background:#fff;
-    color:var(--text);
-    font-size:1rem;
-    cursor:pointer;
-    flex:0 0 auto;
-  }
-
-  .main{
-    padding:14px;
-  }
-
-  .kpis{
-    grid-template-columns:1fr;
-  }
-
-  .grid2{
-    grid-template-columns:1fr;
-  }
-
-  .btns{
-    grid-template-columns:1fr;
-  }
-
-  .chart{
-    height:260px;
-  }
-
-  .chart.lg{
-    height:320px;
-  }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHEMES | Dashboard Comercial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg:#07090f; --bg2:#0d1018; --card:#111520; --card2:#161b28; --line:#1e2535; --line2:#252d40;
+      --text:#e8edf8; --muted:#7a86a3; --muted2:#98a4bf; --cyan:#00c8b4; --cyan2:#008f80;
+      --purple:#7c5cfc; --blue:#3b82f6; --amber:#f59e0b; --green:#22c55e; --red:#ef4444;
+      --sans:'Outfit',sans-serif; --mono:'JetBrains Mono',monospace; --radius:16px;
+      --shadow:0 14px 40px rgba(0,0,0,.22);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background:
+        radial-gradient(ellipse 70% 45% at 0% 0%, rgba(0,200,180,.08) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 60% at 100% 100%, rgba(124,92,252,.08) 0%, transparent 60%);
+    }
+    .app{position:relative;z-index:1;min-height:100vh}
+    header{
+      position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:1rem;justify-content:space-between;
+      padding:.9rem 1.2rem;border-bottom:1px solid var(--line);background:rgba(7,9,15,.88);backdrop-filter:blur(14px)
+    }
+    .logo{display:flex;align-items:center;gap:.8rem;min-width:0}
+    .logo-mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#05201d;font-weight:800}
+    .logo h1{font-size:1.08rem;margin:0;line-height:1.05;letter-spacing:-.02em}
+    .logo h1 span{color:var(--cyan)}
+    .logo small{display:block;color:var(--muted);font-size:.64rem;letter-spacing:.08em}
+    .top-actions{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;justify-content:flex-end}
+    .pill,.btn,.select,.input{border:1px solid var(--line);background:var(--card);color:var(--text)}
+    .pill{padding:.38rem .72rem;border-radius:999px;font-size:.68rem;font-weight:700}
+    .pill.warn{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.28);color:var(--amber)}
+    .pill.ok{background:rgba(34,197,94,.09);border-color:rgba(34,197,94,.25);color:var(--green)}
+    .btn,.select,.input{
+      border-radius:10px;padding:.52rem .8rem;font:600 .76rem var(--sans);outline:none;transition:.18s ease;
+    }
+    .btn{cursor:pointer}
+    .btn:hover,.select:focus,.input:focus{border-color:var(--cyan);color:var(--cyan)}
+    .btn.primary{background:rgba(0,200,180,.12);border-color:rgba(0,200,180,.38);color:var(--cyan)}
+    .container{max-width:1680px;margin:0 auto;padding:1rem}
+    .toolbar{display:grid;grid-template-columns:1.25fr auto auto auto;gap:.7rem;align-items:center;margin-bottom:1rem}
+    .period-strip{display:flex;gap:.38rem;overflow:auto;padding-bottom:.15rem;scrollbar-width:thin}
+    .period-strip::-webkit-scrollbar{height:6px}
+    .period-strip::-webkit-scrollbar-thumb{background:var(--line2);border-radius:999px}
+    .ptab{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--muted);padding:.44rem .82rem;border-radius:999px;font:700 .72rem var(--sans);cursor:pointer}
+    .ptab.active,.ptab:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,180,.10)}
+    .filter-box{display:flex;align-items:center;gap:.55rem;justify-content:flex-end;flex-wrap:wrap}
+    .statusbar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.9rem}
+    .status-chip{padding:.45rem .7rem;border-radius:10px;background:var(--card);border:1px solid var(--line);font-size:.68rem;color:var(--muted)}
+    .status-chip b{color:var(--text)}
+    .grid-kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem;margin-bottom:.9rem}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.01), rgba(255,255,255,0));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .kpi{padding:1rem;position:relative}
+    .kpi::before{content:'';position:absolute;left:0;right:0;top:0;height:3px}
+    .kpi.c0::before{background:linear-gradient(90deg,var(--cyan),var(--cyan2))}
+    .kpi.c1::before{background:linear-gradient(90deg,var(--purple),#5b21b6)}
+    .kpi.c2::before{background:linear-gradient(90deg,var(--blue),#1d4ed8)}
+    .kpi.c3::before{background:linear-gradient(90deg,var(--amber),#d97706)}
+    .kpi.c4::before{background:linear-gradient(90deg,var(--green),#15803d)}
+    .kpi .label{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .kpi .value{margin-top:.42rem;font:800 1.55rem var(--mono);letter-spacing:-.03em}
+    .kpi .sub{margin-top:.35rem;font-size:.68rem;color:var(--muted);display:flex;gap:.45rem;align-items:center;flex-wrap:wrap}
+    .badge-delta{padding:.12rem .38rem;border-radius:5px;font-size:.62rem;font-weight:800}
+    .delta-up{background:rgba(34,197,94,.11);color:var(--green)}
+    .delta-dn{background:rgba(239,68,68,.11);color:var(--red)}
+    .layout{display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:.8rem;margin-bottom:.8rem}
+    .layout-2{display:grid;grid-template-columns:1.55fr 1fr;gap:.8rem;margin-bottom:.8rem}
+    .layout-3{display:grid;grid-template-columns:1.2fr 1fr;gap:.8rem;margin-bottom:.8rem}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.9rem 1rem;border-bottom:1px solid var(--line);flex-wrap:wrap}
+    .title{font-size:.88rem;font-weight:700}
+    .subt{font-size:.64rem;color:var(--muted);margin-top:.1rem}
+    .card-body{padding:1rem}
+    .chart-wrap{height:300px}
+    .chart-wrap.sm{height:230px}
+    .chart-wrap.xs{height:120px}
+    .muted{color:var(--muted)}
+    .mono{font-family:var(--mono)}
+    .split-mini{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+    .mini{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:.85rem}
+    .mini .label{font-size:.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+    .mini .value{margin-top:.35rem;font:800 1.1rem var(--mono)}
+    .mini.cy .value{color:var(--cyan)} .mini.pu .value{color:var(--purple)}
+    .legend-list,.stock-list,.obj-list{display:flex;flex-direction:column;gap:.45rem}
+    .legend-item,.stock-item,.obj-item{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:.75rem .82rem}
+    .legend-row,.stock-top,.obj-top{display:flex;align-items:center;justify-content:space-between;gap:.65rem}
+    .legend-name,.stock-name,.obj-name{font-size:.76rem;font-weight:600}
+    .legend-val,.stock-val,.obj-val{font:700 .73rem var(--mono)}
+    .progress{height:7px;border-radius:999px;background:var(--line2);overflow:hidden;margin-top:.45rem}
+    .progress > span{display:block;height:100%;border-radius:999px}
+    .progress.cyan > span{background:linear-gradient(90deg,var(--cyan),#15d6c2)}
+    .progress.amber > span{background:linear-gradient(90deg,var(--amber),#fbbf24)}
+    .progress.green > span{background:linear-gradient(90deg,var(--green),#4ade80)}
+    .progress.red > span{background:linear-gradient(90deg,var(--red),#fb7185)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.68rem .85rem;border-bottom:1px solid var(--line)}
+    th{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;text-align:left;background:var(--bg2);position:sticky;top:0;z-index:1}
+    td{font-size:.76rem}
+    td.r,th.r{text-align:right}
+    tbody tr:hover td{background:rgba(255,255,255,.018)}
+    .table-wrap{max-height:430px;overflow:auto}
+    .rank{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:7px;background:var(--card2);border:1px solid var(--line);font:700 .62rem var(--mono);color:var(--muted)}
+    .rank.top{background:rgba(245,158,11,.14);color:var(--amber);border-color:rgba(245,158,11,.25)}
+    .state{display:inline-flex;align-items:center;gap:.38rem;font-size:.67rem}
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.g{background:var(--green);box-shadow:0 0 10px rgba(34,197,94,.35)}
+    .dot.a{background:var(--amber);box-shadow:0 0 10px rgba(245,158,11,.35)}
+    .dot.r{background:var(--red);box-shadow:0 0 10px rgba(239,68,68,.35)}
+    .helper{font-size:.67rem;color:var(--muted)}
+    .empty,.errorbox{padding:1rem;border:1px dashed var(--line2);border-radius:12px;color:var(--muted);text-align:center}
+    .errorbox{color:#fecaca;border-color:rgba(239,68,68,.35);background:rgba(127,29,29,.14)}
+    .footer-note{margin-top:.9rem;color:var(--muted);font-size:.66rem;text-align:right}
+    .hidden{display:none !important}
+
+    @media (max-width:1280px){
+      .grid-kpi{grid-template-columns:repeat(3,1fr)}
+      .layout{grid-template-columns:1fr 1fr}
+      .layout > .card:first-child{grid-column:1 / -1}
+      .toolbar{grid-template-columns:1fr;align-items:stretch}
+      .filter-box{justify-content:flex-start}
+    }
+    @media (max-width:900px){
+      .grid-kpi{grid-template-columns:repeat(2,1fr)}
+      .layout,.layout-2,.layout-3{grid-template-columns:1fr}
+      .container{padding:.85rem}
+      header{padding:.8rem .9rem}
+      .top-actions{width:100%;justify-content:flex-start}
+    }
+    @media (max-width:560px){
+      .grid-kpi{grid-template-columns:1fr}
+      .split-mini{grid-template-columns:1fr 1fr}
+      .logo h1{font-size:.98rem}
+      .card-head{padding:.8rem .85rem}
+      .card-body{padding:.85rem}
+      th,td{padding:.58rem .65rem}
+      .select,.btn,.input{width:100%}
+      .filter-box{display:grid;grid-template-columns:1fr}
+      .period-strip{padding-bottom:.25rem}
+    }
+  </style>
 </head>
 <body>
-<div class="mobileTopbar">
-  <div class="mobileBrand">
-    <div class="logo">CH</div>
-    <div>
-      <strong>CHEMES Comercial</strong>
-      <small>Tablero modular profesional</small>
-    </div>
-  </div>
-  <button class="mobileMenuBtn" id="mobileMenuBtn" aria-label="Abrir menú">☰</button>
-</div>
-
-<div class="mobileOverlay" id="mobileOverlay"></div>
-
 <div class="app">
-  <aside class="side" id="sidebar">
-    <div class="sideMobileHead">
-      <div class="brand">
-        <div class="logo">CH</div>
-        <div>
-          <h1>CHEMES Comercial</h1>
-          <small>Tablero modular profesional</small>
-        </div>
-      </div>
-      <button class="sideCloseBtn" id="sideCloseBtn" aria-label="Cerrar menú">✕</button>
-    </div>
-
-    <nav class="nav">
-      <button class="active" data-view="resumen">Resumen Ejecutivo</button>
-      <button data-view="sucursales">Sucursales</button>
-      <button data-view="vendedores">Vendedores</button>
-      <button data-view="productos">Productos & Stock</button>
-      <button data-view="arquitectura">Arquitectura</button>
-    </nav>
-
-    <div class="panel pad">
-      <h3>Filtros globales</h3>
-
-      <div class="field">
-        <label>Período</label>
-        <select id="periodo">
-          <option value="hoy">Hoy</option>
-          <option value="semana">Semana actual</option>
-          <option value="mes" selected>Mes actual</option>
-          <option value="30d">Últimos 30 días</option>
-          <option value="90d">Últimos 90 días</option>
-          <option value="personalizado">Personalizado</option>
-        </select>
-      </div>
-
-      <div class="grid2">
-        <div class="field">
-          <label>Desde</label>
-          <input type="date" id="desde">
-        </div>
-        <div class="field">
-          <label>Hasta</label>
-          <input type="date" id="hasta">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Sucursal</label>
-        <select id="sucursal"><option value="">Todas</option></select>
-      </div>
-
-      <div class="field">
-        <label>Vendedor</label>
-        <select id="vendedor"><option value="">Todos</option></select>
-      </div>
-
-      <div class="field">
-        <label>Buscar producto / SKU</label>
-        <input id="qProducto" placeholder="Ej. H01007282 o Samsung">
-      </div>
-
-      <div class="field">
-        <label>Objetivo mensual (ARS)</label>
-        <input id="objetivo" type="number" min="0" step="0.01" placeholder="Opcional para cumplimiento">
-      </div>
-
-      <div class="btns">
-        <button class="btn primary" id="btnAplicar">Aplicar</button>
-        <button class="btn" id="btnLimpiar">Limpiar</button>
-      </div>
-
-      <div class="mini" id="filtrosTexto">Sin filtros activos.</div>
-      <div class="mini">
-        Backend conservado: Apps Script v3.  
-        Esta versión prioriza lectura ejecutiva y evita abusar de endpoints pesados en pantalla.
+  <header>
+    <div class="logo">
+      <div class="logo-mark">CH</div>
+      <div>
+        <h1>CHEMES <span>Dashboard Comercial</span></h1>
+        <small id="headerSubtitle">VISIÓN EJECUTIVA · SUCURSALES</small>
       </div>
     </div>
-  </aside>
-
-  <main class="main">
-    <div class="topbar">
-      <div class="title">
-        <h2 id="pageTitle">Resumen Ejecutivo</h2>
-        <small id="pageDesc">Lectura comercial compacta, profesional y orientada a decisión.</small>
-      </div>
-      <div class="status">
-        <div class="tag">Modelo <strong>modular</strong></div>
-        <div class="tag">Backend <strong>Apps Script v3</strong></div>
-        <div class="tag">Modo <strong id="modoTag">detectando</strong></div>
-        <div class="tag">Estado <strong id="healthTag">sin verificar</strong></div>
-      </div>
+    <div class="top-actions">
+      <div class="pill" id="modePill">Modo empresa</div>
+      <div class="pill warn hidden" id="demoPill">Sin backend configurado</div>
+      <div class="pill ok" id="healthPill">Inicializando</div>
+      <button class="btn primary" id="btnRefresh">Actualizar</button>
     </div>
+  </header>
 
-    <div class="banner" id="banner"></div>
-
-    <section class="kpis">
-      <div class="kpi k1">
-        <div class="lbl">Ventas netas</div>
-        <div class="val" id="kVentas">$0</div>
-        <div class="sub">Cumplimiento objetivo: <span id="kObj">n/d</span></div>
+  <main class="container">
+    <section class="toolbar">
+      <div class="period-strip" id="periodStrip">
+        <button class="ptab" data-period="today">Hoy</button>
+        <button class="ptab" data-period="week">Semana</button>
+        <button class="ptab active" data-period="month">Mes actual</button>
+        <button class="ptab" data-period="lastmonth">Mes anterior</button>
+        <button class="ptab" data-period="3months">3 meses</button>
+        <button class="ptab" data-period="6months">6 meses</button>
       </div>
-      <div class="kpi k2">
-        <div class="lbl">Comprobantes / Ticket</div>
-        <div class="val" id="kDocs">0</div>
-        <div class="sub">Ticket promedio: <span id="kTicket">$0</span></div>
-      </div>
-      <div class="kpi k3">
-        <div class="lbl">Garantías</div>
-        <div class="val" id="kGar">$0</div>
-        <div class="sub">% facturas: <span id="kGarFac">0%</span> · % venta: <span id="kGarVta">0%</span></div>
-      </div>
-      <div class="kpi k4">
-        <div class="lbl">Seguros CHEMES</div>
-        <div class="val" id="kPol">$0</div>
-        <div class="sub">Cant: <span id="kPolCant">0</span> · % venta: <span id="kPolVta">0%</span></div>
+      <select class="select" id="groupSel">
+        <option value="daily">Evolución diaria</option>
+        <option value="weekly">Evolución semanal</option>
+        <option value="monthly">Evolución mensual</option>
+      </select>
+      <input class="input" id="searchInput" type="text" placeholder="Buscar SKU o descripción en ranking / stock">
+      <div class="filter-box">
+        <button class="btn" id="btnSearch">Aplicar filtro</button>
       </div>
     </section>
 
-    <section class="view active" id="view-resumen">
-      <div class="row r2">
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Evolución de ventas</h3>
-              <small>Serie diaria del período filtrado</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="chart"><canvas id="chVentas"></canvas></div>
-          </div>
-        </article>
+    <section class="statusbar">
+      <div class="status-chip">Período: <b id="lblPeriodo">Mes actual</b></div>
+      <div class="status-chip">Sucursal: <b id="lblSucursal">Todas</b></div>
+      <div class="status-chip">Datos al: <b id="lblFechaDatos">--</b></div>
+      <div class="status-chip">Backend: <b id="lblBackend">--</b></div>
+    </section>
 
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Mix comercial</h3>
-              <small>Garantías y Seguros CHEMES</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="chart sm"><canvas id="chMix"></canvas></div>
-            <div class="footerNote">
-              Seguros CHEMES toma AS0015 P112 / P212 / P312.  
-              La vista prioriza agregados y evita sobrecargar la interfaz con detalle innecesario.
-            </div>
-          </div>
-        </article>
+    <section class="grid-kpi">
+      <div class="card kpi c0">
+        <div class="label">Ventas netas</div>
+        <div class="value" id="kpiVentas">$0</div>
+        <div class="sub"><span>Período actual</span></div>
       </div>
-
-      <div class="row r2e">
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Top sucursales</h3>
-              <small>Ventas netas y cobertura comercial</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="list" id="topSucursales"></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Top vendedores</h3>
-              <small>% garantías $ / venta</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="list" id="topVendedores"></div>
-          </div>
-        </article>
+      <div class="card kpi c1">
+        <div class="label">Comprobantes</div>
+        <div class="value" id="kpiComp">0</div>
+        <div class="sub"><span>Ticket prom.</span><b class="mono" id="kpiTicket">$0</b></div>
+      </div>
+      <div class="card kpi c2">
+        <div class="label">Unidades</div>
+        <div class="value" id="kpiUnid">0</div>
+        <div class="sub"><span>Movidas en el período</span></div>
+      </div>
+      <div class="card kpi c3">
+        <div class="label">Garantías</div>
+        <div class="value" id="kpiGar">$0</div>
+        <div class="sub"><span>Adherencia</span><b class="mono" id="kpiGarPct">0%</b></div>
+      </div>
+      <div class="card kpi c4">
+        <div class="label">Pólizas</div>
+        <div class="value" id="kpiPol">$0</div>
+        <div class="sub"><span>Adherencia</span><b class="mono" id="kpiPolPct">0%</b></div>
       </div>
     </section>
 
-    <section class="view" id="view-sucursales">
+    <section class="layout">
       <article class="card">
-        <div class="head">
+        <div class="card-head">
           <div>
-            <h3>Desempeño por sucursal</h3>
-            <small>Lectura comparativa ejecutiva</small>
+            <div class="title">Evolución del período</div>
+            <div class="subt">Serie principal alimentada por api=resumen</div>
           </div>
         </div>
-        <div class="body tableWrap">
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th>Sucursal</th>
-                <th class="r">Ventas</th>
-                <th class="r">Comprobantes</th>
-                <th class="r">Ticket</th>
-                <th class="r">Garantías $</th>
-                <th class="r">% Gar/Fact</th>
-                <th class="r">Seguros $</th>
-                <th class="r">% Seg/Vta</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody id="tbSucursales"></tbody>
-          </table>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chartEvo"></canvas></div>
+        </div>
+      </article>
+
+      <article class="card" id="cardDonut">
+        <div class="card-head">
+          <div>
+            <div class="title">Participación por sucursal</div>
+            <div class="subt" id="donutSubtitle">Top 7 por ventas</div>
+          </div>
+          <select class="select" id="donutMode">
+            <option value="ventas">Ventas</option>
+            <option value="garantias">Garantías</option>
+            <option value="polizas">Pólizas</option>
+          </select>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap sm"><canvas id="chartDonut"></canvas></div>
+          <div class="legend-list" id="donutLegend"></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">Garantías y pólizas</div>
+            <div class="subt">Resumen rápido del período</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="split-mini">
+            <div class="mini cy">
+              <div class="label">Importe garantías</div>
+              <div class="value" id="miniGarImp">$0</div>
+            </div>
+            <div class="mini pu">
+              <div class="label">Importe pólizas</div>
+              <div class="value" id="miniPolImp">$0</div>
+            </div>
+            <div class="mini cy">
+              <div class="label">Mix garantías</div>
+              <div class="value" id="miniGarMix">0%</div>
+            </div>
+            <div class="mini pu">
+              <div class="label">Mix pólizas</div>
+              <div class="value" id="miniPolMix">0%</div>
+            </div>
+          </div>
+          <div class="chart-wrap xs" style="margin-top:.8rem"><canvas id="chartGP"></canvas></div>
         </div>
       </article>
     </section>
 
-    <section class="view" id="view-vendedores">
-      <div class="row r2">
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Ranking por vendedor</h3>
-              <small>Ventas netas y participación de garantías</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="chart lg"><canvas id="chVendedores"></canvas></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Lectura comercial</h3>
-              <small>Top foco</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="list" id="insightsVendedores"></div>
-          </div>
-        </article>
-      </div>
-
-      <article class="card">
-        <div class="head">
+    <section class="layout-2">
+      <article class="card" id="cardRankingSucursales">
+        <div class="card-head">
           <div>
-            <h3>Detalle por vendedor</h3>
-            <small>Filtro por sucursal y vendedor</small>
+            <div class="title">Desempeño por sucursal</div>
+            <div class="subt">Lectura comparativa ejecutiva</div>
           </div>
         </div>
-        <div class="body tableWrap">
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th>Vendedor</th>
-                <th>Sucursales</th>
-                <th class="r">Ventas</th>
-                <th class="r">Comprobantes</th>
-                <th class="r">Garantías $</th>
-                <th class="r">% Gar/Vta</th>
-                <th class="r">Seguros $</th>
-                <th class="r">% Seg/Vta</th>
-              </tr>
-            </thead>
-            <tbody id="tbVendedores"></tbody>
-          </table>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Sucursal</th>
+                  <th class="r">Ventas</th>
+                  <th class="r">Comprobantes</th>
+                  <th class="r">Ticket</th>
+                  <th class="r">Garantías</th>
+                  <th class="r">Pólizas</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tbodySucursales"></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="cardObjetivos">
+        <div class="card-head">
+          <div>
+            <div class="title">Adherencia por sucursal</div>
+            <div class="subt">Participación relativa dentro del período</div>
+          </div>
+          <select class="select" id="objMode">
+            <option value="ventas">Ventas</option>
+            <option value="garantias">Garantías</option>
+            <option value="polizas">Pólizas</option>
+          </select>
+        </div>
+        <div class="card-body">
+          <div class="obj-list" id="objList"></div>
         </div>
       </article>
     </section>
 
-    <section class="view" id="view-productos">
-      <div class="row r2">
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Productos con foco comercial</h3>
-              <small>Top productos, stock y cobertura</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="chart lg"><canvas id="chProductos"></canvas></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Alertas de stock</h3>
-              <small>Quiebres y cobertura crítica</small>
-            </div>
-          </div>
-          <div class="body">
-            <div class="list" id="insightsProductos"></div>
-          </div>
-        </article>
-      </div>
-
+    <section class="layout-3">
       <article class="card">
-        <div class="head">
+        <div class="card-head">
           <div>
-            <h3>Ranking de productos</h3>
-            <small>Vista acotada para no saturar el frontend</small>
-          </div>
-          <div>
-            <label style="font-size:.78rem;color:var(--muted)">Solo quiebre <input type="checkbox" id="soloQuiebre"></label>
+            <div class="title" id="titleRankingArt">Top artículos</div>
+            <div class="subt">Ranking consolidado del período / contexto actual</div>
           </div>
         </div>
-        <div class="body tableWrap">
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th>Sucursal</th>
-                <th>SKU</th>
-                <th>Descripción</th>
-                <th>Tipo</th>
-                <th class="r">Unidades ranking</th>
-                <th class="r">Importe ranking</th>
-                <th class="r">Stock disp.</th>
-                <th class="r">Stock proy.</th>
-                <th class="r">Cobertura días</th>
-                <th>Depósito/CD</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody id="tbProductos"></tbody>
-          </table>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>SKU</th>
+                  <th>Descripción</th>
+                  <th class="r">Unidades</th>
+                  <th class="r">Importe</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyArticulos"></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <div class="title">Stock crítico / quiebre</div>
+            <div class="subt">Lectura operativa desde api=stock</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="stock-list" id="stockList"></div>
         </div>
       </article>
     </section>
 
-    <section class="view" id="view-arquitectura">
-      <div class="row r2e">
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Circuito funcional</h3>
-              <small>Cómo se alimenta el tablero</small>
-            </div>
-          </div>
-          <div class="body" id="circuitoBox"></div>
-        </article>
-
-        <article class="card">
-          <div class="head">
-            <div>
-              <h3>Observación sobre endpoints</h3>
-              <small>Limitaciones actuales y criterio de uso</small>
-            </div>
-          </div>
-          <div class="body" id="escalaBox"></div>
-        </article>
-      </div>
-    </section>
+    <div id="errorBox" class="errorbox hidden"></div>
+    <div class="footer-note">Versión HTML final para Apps Script v4 · modo empresa + modo sucursal por token</div>
   </main>
 </div>
 
 <script>
-(() => {
-  const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec";
-  const paramsUrl = new URLSearchParams(location.search);
-  const API_URL = String(window.CHEMES_API_URL || paramsUrl.get('apiUrl') || DEFAULT_API_URL || '').trim();
-  const tenantSucursal = String(paramsUrl.get('suc') || '').trim();
-  const tenantToken = String(paramsUrl.get('t') || '').trim();
+const CONFIG = {
+  API_BASE: 'PEGAR_AQUI_URL_WEBAPP_APPS_SCRIPT',
+  DEFAULT_PERIOD: 'month'
+};
 
-  const $ = s => document.querySelector(s);
-  const $$ = s => Array.from(document.querySelectorAll(s));
+const COLORS = ['#00c8b4','#7c5cfc','#3b82f6','#f59e0b','#22c55e','#ef4444','#14b8a6','#f97316','#6366f1','#e879f9'];
 
-  const EXCLUDED_VENDEDORES = new Set(['DISPONIBLE']);
-  const EXCLUDED_VENDEDORES_CONTAINS = ['NO USAR'];
+const state = {
+  period: CONFIG.DEFAULT_PERIOD,
+  group: 'daily',
+  search: '',
+  sucursal: '',
+  token: '',
+  resumen: null,
+  ranking: null,
+  stock: null,
+  health: null,
+  loading: false,
+  charts: {}
+};
 
-  const state = {
-    charts: {},
-    currentView: 'resumen',
-    lookups: { sucursales: [], vendedores: [] },
-    ventasDetalle: [],
-    resumen: null,
-    vendedores: [],
-    productos: [],
-    sucursalesAgg: [],
-    health: null
+const qs = new URLSearchParams(location.search);
+state.sucursal = (qs.get('suc') || '').trim();
+state.token = (qs.get('t') || '').trim();
+
+const PERIODS = {
+  today:     { label:'Hoy', getRange(){ const t = todayLocal(); return { desde: isoDate(t), hasta: isoDate(t) }; } },
+  week:      { label:'Semana actual', getRange(){ const t=todayLocal(); const day=(t.getDay()+6)%7; const desde=addDays(t,-day); return {desde:isoDate(desde), hasta:isoDate(t)}; } },
+  month:     { label:'Mes actual', getRange(){ const t=todayLocal(); const desde=new Date(t.getFullYear(),t.getMonth(),1); return {desde:isoDate(desde), hasta:isoDate(t)}; } },
+  lastmonth: { label:'Mes anterior', getRange(){ const t=todayLocal(); const desde=new Date(t.getFullYear(),t.getMonth()-1,1); const hasta=new Date(t.getFullYear(),t.getMonth(),0); return {desde:isoDate(desde), hasta:isoDate(hasta)}; } },
+  '3months': { label:'Últimos 3 meses', getRange(){ const t=todayLocal(); const desde=new Date(t.getFullYear(),t.getMonth()-2,1); return {desde:isoDate(desde), hasta:isoDate(t)}; } },
+  '6months': { label:'Últimos 6 meses', getRange(){ const t=todayLocal(); const desde=new Date(t.getFullYear(),t.getMonth()-5,1); return {desde:isoDate(desde), hasta:isoDate(t)}; } },
+};
+
+function todayLocal(){ return new Date(); }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function isoDate(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function fmtMoney(v){ return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v||0)); }
+function fmtNum(v){ return new Intl.NumberFormat('es-AR',{maximumFractionDigits:0}).format(Number(v||0)); }
+function fmtPct(v){ return `${Number(v||0).toFixed(1)}%`; }
+function safeArr(v){ return Array.isArray(v) ? v : []; }
+function escapeHtml(s){ return String(s||'').replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+function getApiBase(){ return (CONFIG.API_BASE || '').trim(); }
+function buildApiUrl(api, extra={}){
+  const base = getApiBase();
+  if(!base || base.includes('PEGAR_AQUI')) throw new Error('Falta configurar CONFIG.API_BASE con la URL desplegada del Apps Script');
+  const url = new URL(base);
+  url.searchParams.set('api', api);
+  const range = PERIODS[state.period].getRange();
+  if(extra.useRange !== false){
+    url.searchParams.set('desde', range.desde);
+    url.searchParams.set('hasta', range.hasta);
+  }
+  if(state.search) url.searchParams.set('q', state.search);
+  if(state.sucursal) url.searchParams.set('sucursal', state.sucursal);
+  if(state.token) url.searchParams.set('t', state.token);
+  Object.entries(extra).forEach(([k,v]) => {
+    if(k === 'useRange') return;
+    if(v !== undefined && v !== null && v !== '') url.searchParams.set(k, v);
+  });
+  return url.toString();
+}
+
+async function apiFetch(api, extra={}){
+  const res = await fetch(buildApiUrl(api, extra), { cache:'no-store' });
+  if(!res.ok) throw new Error(`HTTP ${res.status} al consultar ${api}`);
+  const json = await res.json();
+  if(json && json.error) throw new Error(json.message || `Error en ${api}`);
+  return json;
+}
+
+function setLoading(flag){
+  state.loading = flag;
+  document.getElementById('healthPill').textContent = flag ? 'Cargando' : 'Operativo';
+  document.getElementById('healthPill').className = `pill ${flag ? 'warn' : 'ok'}`;
+}
+
+function setError(msg=''){
+  const box = document.getElementById('errorBox');
+  if(!msg){ box.classList.add('hidden'); box.textContent=''; return; }
+  box.classList.remove('hidden');
+  box.textContent = msg;
+}
+
+function getParticipationLabel(val){
+  if(val >= 20) return ['g','Alta'];
+  if(val >= 10) return ['a','Media'];
+  return ['r','Baja'];
+}
+
+function updateStaticLabels(){
+  const periodMeta = PERIODS[state.period];
+  document.querySelectorAll('.ptab').forEach(b => b.classList.toggle('active', b.dataset.period === state.period));
+  document.getElementById('lblPeriodo').textContent = periodMeta.label;
+  document.getElementById('lblSucursal').textContent = state.sucursal || 'Todas';
+  document.getElementById('modePill').textContent = state.sucursal ? `Modo sucursal · ${state.sucursal}` : 'Modo empresa';
+  document.getElementById('headerSubtitle').textContent = state.sucursal ? 'VISIÓN OPERATIVA · SUCURSAL FIJA POR TOKEN' : 'VISIÓN EJECUTIVA · TODAS LAS SUCURSALES';
+  document.getElementById('titleRankingArt').textContent = state.sucursal ? 'Top artículos de la sucursal' : 'Top artículos';
+  document.getElementById('cardDonut').classList.toggle('hidden', !!state.sucursal);
+  document.getElementById('cardRankingSucursales').classList.toggle('hidden', !!state.sucursal);
+  document.getElementById('cardObjetivos').classList.toggle('hidden', !!state.sucursal);
+}
+
+function renderKpis(){
+  const r = state.resumen || {};
+  const k = r.kpis || {};
+  document.getElementById('kpiVentas').textContent = fmtMoney(k.ventasNetas || 0);
+  document.getElementById('kpiComp').textContent = fmtNum(k.comprobantes || 0);
+  document.getElementById('kpiTicket').textContent = fmtMoney(k.ticketPromedio || 0);
+  document.getElementById('kpiUnid').textContent = fmtNum(k.unidades || 0);
+  document.getElementById('kpiGar').textContent = fmtMoney(k.garantias || 0);
+  document.getElementById('kpiPol').textContent = fmtMoney(k.polizas || 0);
+  const ventas = Number(k.ventasNetas || 0);
+  document.getElementById('kpiGarPct').textContent = fmtPct(ventas ? ((Number(k.garantias||0) / ventas) * 100) : 0);
+  document.getElementById('kpiPolPct').textContent = fmtPct(ventas ? ((Number(k.polizas||0) / ventas) * 100) : 0);
+  document.getElementById('miniGarImp').textContent = fmtMoney(k.garantias || 0);
+  document.getElementById('miniPolImp').textContent = fmtMoney(k.polizas || 0);
+  document.getElementById('miniGarMix').textContent = fmtPct(ventas ? ((Number(k.garantias||0) / ventas) * 100) : 0);
+  document.getElementById('miniPolMix').textContent = fmtPct(ventas ? ((Number(k.polizas||0) / ventas) * 100) : 0);
+  document.getElementById('lblFechaDatos').textContent = r.maxFecha || state.stock?.fecha_refresco || '--';
+}
+
+function destroyChart(key){ if(state.charts[key]) { state.charts[key].destroy(); state.charts[key] = null; } }
+
+function renderEvolucion(){
+  destroyChart('evo');
+  const evo = safeArr(state.resumen?.evolucion);
+  const grouped = aggregateEvolution(evo, state.group);
+  const ctx = document.getElementById('chartEvo');
+  state.charts.evo = new Chart(ctx, {
+    type:'line',
+    data:{ labels: grouped.labels, datasets:[{ label:'Ventas', data: grouped.values, borderColor:'#00c8b4', backgroundColor:'rgba(0,200,180,.18)', tension:.28, fill:true, pointRadius:2, pointHoverRadius:4 }] },
+    options: baseChartOptions({ currency:true })
+  });
+}
+
+function aggregateEvolution(rows, group){
+  if(group === 'daily') return { labels: rows.map(x => x.fecha), values: rows.map(x => Number(x.ventas||0)) };
+  const map = new Map();
+  rows.forEach(r => {
+    const d = new Date(`${r.fecha}T00:00:00`);
+    let key = r.fecha;
+    if(group === 'weekly'){
+      const x = new Date(d); const day = (x.getDay()+6)%7; x.setDate(x.getDate()-day); key = isoDate(x);
+    }
+    if(group === 'monthly') key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    map.set(key, (map.get(key)||0) + Number(r.ventas||0));
+  });
+  const labels = Array.from(map.keys()).sort();
+  return { labels, values: labels.map(k => map.get(k) || 0) };
+}
+
+function renderDonut(){
+  if(state.sucursal) return;
+  destroyChart('donut');
+  const mode = document.getElementById('donutMode').value;
+  const rows = safeArr(state.resumen?.sucursales).slice().sort((a,b) => Number(b[mode]||0) - Number(a[mode]||0)).slice(0,7);
+  const labels = rows.map(r => r.sucursal);
+  const values = rows.map(r => Number(r[mode] || 0));
+  const ctx = document.getElementById('chartDonut');
+  state.charts.donut = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels, datasets:[{ data: values, backgroundColor: COLORS, borderColor:'#111520', borderWidth:2 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => `${c.label}: ${mode === 'ventas' || mode === 'garantias' || mode === 'polizas' ? fmtMoney(c.raw) : fmtNum(c.raw)}` } } } }
+  });
+  const total = values.reduce((a,b)=>a+b,0);
+  document.getElementById('donutSubtitle').textContent = `Top ${rows.length} por ${mode}`;
+  document.getElementById('donutLegend').innerHTML = rows.map((r,i) => {
+    const pct = total ? ((Number(r[mode]||0) / total) * 100) : 0;
+    return `<div class="legend-item"><div class="legend-row"><div class="legend-name"><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:${COLORS[i]}"></span> ${escapeHtml(r.sucursal)}</div><div class="legend-val">${fmtPct(pct)}</div></div><div class="progress cyan"><span style="width:${Math.min(100,pct)}%"></span></div></div>`;
+  }).join('') || '<div class="empty">Sin datos para participación por sucursal.</div>';
+}
+
+function renderGP(){
+  destroyChart('gp');
+  const r = state.resumen || {}; const k = r.kpis || {};
+  const ctx = document.getElementById('chartGP');
+  state.charts.gp = new Chart(ctx, {
+    type:'bar',
+    data:{ labels:['Garantías','Pólizas'], datasets:[{ data:[Number(k.garantias||0), Number(k.polizas||0)], backgroundColor:['rgba(0,200,180,.65)','rgba(124,92,252,.65)'], borderColor:['#00c8b4','#7c5cfc'], borderWidth:1.5, borderRadius:8 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => fmtMoney(c.raw) } } }, scales:{ x:{ ticks:{ color:'#9aa7c0' }, grid:{ display:false } }, y:{ ticks:{ color:'#9aa7c0', callback:v => fmtMoney(v) }, grid:{ color:'rgba(255,255,255,.06)' } } } }
+  });
+}
+
+function renderSucursales(){
+  const rows = safeArr(state.resumen?.sucursales);
+  const tbody = document.getElementById('tbodySucursales');
+  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="8"><div class="empty">Sin datos de sucursales para el período.</div></td></tr>'; return; }
+  tbody.innerHTML = rows.map((r,i) => {
+    const part = (state.resumen?.kpis?.ventasNetas ? ((Number(r.ventas||0) / Number(state.resumen.kpis.ventasNetas||0))*100) : 0);
+    const [cls, txt] = getParticipationLabel(part);
+    return `<tr>
+      <td><span class="rank ${i < 3 ? 'top' : ''}">${i+1}</span></td>
+      <td>${escapeHtml(r.sucursal)}</td>
+      <td class="r mono">${fmtMoney(r.ventas)}</td>
+      <td class="r mono">${fmtNum(r.comprobantes)}</td>
+      <td class="r mono">${fmtMoney(r.ticketPromedio)}</td>
+      <td class="r mono">${fmtMoney(r.garantias)}</td>
+      <td class="r mono">${fmtMoney(r.polizas)}</td>
+      <td><span class="state"><span class="dot ${cls}"></span>${txt}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderObjetivos(){
+  if(state.sucursal) return;
+  const mode = document.getElementById('objMode').value;
+  const total = Number(state.resumen?.kpis?.[mode] || 0) || 0;
+  const rows = safeArr(state.resumen?.sucursales)
+    .map(r => ({ sucursal:r.sucursal, valor:Number(r[mode]||0), pct: total ? (Number(r[mode]||0)/total)*100 : 0 }))
+    .sort((a,b) => b.pct - a.pct);
+  const wrap = document.getElementById('objList');
+  wrap.innerHTML = rows.map(r => {
+    const color = r.pct >= 20 ? 'green' : r.pct >= 10 ? 'amber' : 'red';
+    return `<div class="obj-item"><div class="obj-top"><div class="obj-name">${escapeHtml(r.sucursal)}</div><div class="obj-val">${fmtPct(r.pct)}</div></div><div class="progress ${color}"><span style="width:${Math.min(100,r.pct)}%"></span></div><div class="helper" style="margin-top:.35rem">${mode}: ${fmtMoney(r.valor)}</div></div>`;
+  }).join('') || '<div class="empty">Sin datos de adherencia.</div>';
+}
+
+function renderArticulos(){
+  const rows = safeArr(state.ranking?.data || state.resumen?.topArticulos || []);
+  const tbody = document.getElementById('tbodyArticulos');
+  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Sin ranking de artículos.</div></td></tr>'; return; }
+  const sorted = rows.slice().sort((a,b) => Number(b.importe||0) - Number(a.importe||0)).slice(0,40);
+  tbody.innerHTML = sorted.map((r,i) => `<tr>
+    <td><span class="rank ${i < 3 ? 'top' : ''}">${i+1}</span></td>
+    <td class="mono">${escapeHtml(r.sku || '')}</td>
+    <td>${escapeHtml(r.descripcion || '')}</td>
+    <td class="r mono">${fmtNum(r.unidades || 0)}</td>
+    <td class="r mono">${fmtMoney(r.importe || 0)}</td>
+  </tr>`).join('');
+}
+
+function renderStock(){
+  const rows = safeArr(state.stock?.data).slice(0,15);
+  const wrap = document.getElementById('stockList');
+  if(!rows.length){ wrap.innerHTML = '<div class="empty">Sin artículos en quiebre para el filtro actual.</div>'; return; }
+  wrap.innerHTML = rows.map(r => {
+    const cov = r.cobertura_dias == null ? 's/d' : Number(r.cobertura_dias).toFixed(1);
+    const level = Number(r.flag_quiebre || 0) === 1 ? 'red' : ((Number(r.cobertura_dias || 999) <= Number(r.umbral_dias || 0)) ? 'amber' : 'green');
+    const width = r.cobertura_dias == null ? 6 : Math.max(6, Math.min(100, (Number(r.cobertura_dias)/Math.max(1,Number(r.umbral_dias||1)))*100));
+    return `<div class="stock-item">
+      <div class="stock-top"><div class="stock-name">${escapeHtml(r.sku)} · ${escapeHtml(r.descripcion)}</div><div class="stock-val">Cobertura ${cov} d</div></div>
+      <div class="progress ${level}"><span style="width:${width}%"></span></div>
+      <div class="helper" style="margin-top:.4rem">Disponible: <b class="mono">${fmtNum(r.stock_disponible||0)}</b> · Proyectado: <b class="mono">${fmtNum(r.stock_proyectado||0)}</b> · 30d: <b class="mono">${fmtNum(r.unidades_30d||0)}</b></div>
+    </div>`;
+  }).join('');
+}
+
+function baseChartOptions({currency=false}={}){
+  return {
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => currency ? fmtMoney(c.raw) : fmtNum(c.raw) } } },
+    scales:{
+      x:{ ticks:{ color:'#9aa7c0' }, grid:{ display:false } },
+      y:{ ticks:{ color:'#9aa7c0', callback:v => currency ? fmtMoney(v) : fmtNum(v) }, grid:{ color:'rgba(255,255,255,.06)' } }
+    }
   };
+}
 
-  function fmtMoney(v){
-    return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v || 0));
+async function refreshHealth(){
+  try{
+    const data = await apiFetch('health', { useRange:false });
+    state.health = data;
+    const backendOk = data?.archivos && Object.values(data.archivos).some(x => x && x.existe);
+    document.getElementById('lblBackend').textContent = backendOk ? 'Conectado' : 'Sin archivos';
+    document.getElementById('healthPill').textContent = backendOk ? 'Operativo' : 'Revisar';
+    document.getElementById('healthPill').className = `pill ${backendOk ? 'ok' : 'warn'}`;
+  }catch(err){
+    document.getElementById('lblBackend').textContent = 'Error';
+    document.getElementById('healthPill').textContent = 'Error';
+    document.getElementById('healthPill').className = 'pill warn';
+    throw err;
   }
+}
 
-  function fmtShort(v){
-    const n = Number(v || 0), a = Math.abs(n);
-    if (a >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
-    if (a >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
-    if (a >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
-    return fmtMoney(n);
+async function refreshAll(){
+  setError('');
+  setLoading(true);
+  updateStaticLabels();
+  try{
+    await refreshHealth();
+    const [resumen, ranking, stock] = await Promise.all([
+      apiFetch('resumen'),
+      apiFetch('ranking', { useRange:false }),
+      apiFetch('stock', { useRange:false, soloQuiebre:1 })
+    ]);
+    state.resumen = resumen;
+    state.ranking = ranking;
+    state.stock = stock;
+    renderKpis();
+    renderEvolucion();
+    renderDonut();
+    renderGP();
+    renderSucursales();
+    renderObjetivos();
+    renderArticulos();
+    renderStock();
+  }catch(err){
+    console.error(err);
+    setError(err.message || 'Error general al cargar el dashboard');
+  }finally{
+    setLoading(false);
   }
+}
 
-  function fmtNum(v){
-    return new Intl.NumberFormat('es-AR').format(Number(v || 0));
-  }
-
-  function fmtPct(v,d=1){
-    const n = Number(v || 0);
-    return Number.isFinite(n) ? n.toFixed(d) + '%' : '0%';
-  }
-
-  function esc(s){
-    return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-
-  function badgeEstado(objPct){
-    if (objPct == null) return '<span class="badge info">Sin objetivo</span>';
-    if (objPct >= 100) return '<span class="badge ok">Cumple</span>';
-    if (objPct >= 85) return '<span class="badge mid">Atención</span>';
-    return '<span class="badge bad">Bajo</span>';
-  }
-
-  function badgeStock(r){
-    if ((r.flag_quiebre || 0) === 1) return '<span class="badge bad">Quiebre</span>';
-    if (r.cobertura_dias != null && Number(r.cobertura_dias) <= 7) return '<span class="badge mid">Crítico</span>';
-    return '<span class="badge ok">OK</span>';
-  }
-
-  function normVendorName(v){
-    return String(v || '').trim().replace(/\s+/g,' ');
-  }
-
-  function isAllowedVendor(v){
-    const n = normVendorName(v);
-    if (!n) return false;
-    const upper = n.toUpperCase();
-    if (EXCLUDED_VENDEDORES.has(upper)) return false;
-    if (EXCLUDED_VENDEDORES_CONTAINS.some(x => upper.includes(x))) return false;
-    return true;
-  }
-
-  function cleanVendorList(arr){
-    return [...new Set((arr || []).map(normVendorName).filter(isAllowedVendor))].sort((a,b)=>a.localeCompare(b,'es'));
-  }
-
-  function setBanner(msg, type='error'){
-    const b = $('#banner');
-    b.className = 'banner ' + type;
-    b.textContent = msg;
-  }
-
-  function clearBanner(){
-    const b = $('#banner');
-    b.className = 'banner';
-    b.textContent = '';
-  }
-
-  function getDateRange(period){
-    const today = new Date();
-    const iso = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
-    let desde = null, hasta = iso(today);
-
-    if(period === 'hoy'){
-      desde = iso(today);
-    } else if(period === 'semana'){
-      const d = new Date(today);
-      const day = (d.getDay()+6)%7;
-      d.setDate(d.getDate()-day);
-      desde = iso(d);
-    } else if(period === 'mes'){
-      const d = new Date(today.getFullYear(), today.getMonth(), 1);
-      desde = iso(d);
-    } else if(period === '30d'){
-      const d = new Date(today);
-      d.setDate(d.getDate()-29);
-      desde = iso(d);
-    } else if(period === '90d'){
-      const d = new Date(today);
-      d.setDate(d.getDate()-89);
-      desde = iso(d);
+function bindEvents(){
+  document.querySelectorAll('.ptab').forEach(btn => btn.addEventListener('click', () => {
+    state.period = btn.dataset.period;
+    refreshAll();
+  }));
+  document.getElementById('groupSel').addEventListener('change', e => { state.group = e.target.value; renderEvolucion(); });
+  document.getElementById('donutMode').addEventListener('change', renderDonut);
+  document.getElementById('objMode').addEventListener('change', renderObjetivos);
+  document.getElementById('btnRefresh').addEventListener('click', refreshAll);
+  document.getElementById('btnSearch').addEventListener('click', () => {
+    state.search = document.getElementById('searchInput').value.trim();
+    refreshAll();
+  });
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      state.search = e.target.value.trim();
+      refreshAll();
     }
+  });
+}
 
-    return {desde, hasta};
+function init(){
+  bindEvents();
+  if(state.sucursal){
+    document.getElementById('searchInput').placeholder = 'Buscar SKU o descripción dentro de la sucursal';
   }
+  refreshAll();
+}
 
-  function syncDatesByPeriod(){
-    const p = $('#periodo').value;
-    const custom = p === 'personalizado';
-    $('#desde').disabled = !custom;
-    $('#hasta').disabled = !custom;
-    if(!custom){
-      const r = getDateRange(p);
-      $('#desde').value = r.desde || '';
-      $('#hasta').value = r.hasta || '';
-    }
-  }
-
-  function activeFilters(){
-    const objetivo = $('#objetivo').value.trim();
-    return {
-      desde: $('#desde').value || '',
-      hasta: $('#hasta').value || '',
-      sucursal: $('#sucursal').value || '',
-      vendedor: normVendorName($('#vendedor').value || ''),
-      qProducto: $('#qProducto').value.trim(),
-      objetivo: objetivo ? Number(objetivo) : null,
-      soloQuiebre: $('#soloQuiebre').checked ? '1' : ''
-    };
-  }
-
-  function updateFilterText(){
-    const f = activeFilters();
-    const parts = [];
-    if (f.desde || f.hasta) parts.push(`Periodo ${f.desde||'...'} a ${f.hasta||'...'}`);
-    if (f.sucursal) parts.push(`Sucursal: ${f.sucursal}`);
-    if (f.vendedor) parts.push(`Vendedor: ${f.vendedor}`);
-    if (f.qProducto) parts.push(`Producto/SKU: ${f.qProducto}`);
-    if (f.objetivo != null) parts.push(`Objetivo: ${fmtMoney(f.objetivo)}`);
-    $('#filtrosTexto').textContent = parts.length ? parts.join(' · ') : 'Sin filtros activos.';
-  }
-
-  function jsonp(url, params={}){
-    return new Promise((resolve, reject) => {
-      if(!url || !String(url).trim()){
-        reject(new Error('Falta configurar la URL del Web App de Apps Script.'));
-        return;
-      }
-
-      const cb = '__chemes_cb_' + Math.random().toString(36).slice(2);
-      params.callback = cb;
-      const qs = new URLSearchParams(params);
-      const sep = url.includes('?') ? '&' : '?';
-      const script = document.createElement('script');
-      const timeout = setTimeout(() => {
-        cleanup();
-        reject(new Error('Timeout consultando API.'));
-      }, 25000);
-
-      function cleanup(){
-        clearTimeout(timeout);
-        delete window[cb];
-        if(script.parentNode) script.parentNode.removeChild(script);
-      }
-
-      window[cb] = data => {
-        cleanup();
-        resolve(data);
-      };
-
-      script.onerror = () => {
-        cleanup();
-        reject(new Error('No se pudo cargar la respuesta JSONP.'));
-      };
-
-      script.src = url + sep + qs.toString();
-      document.body.appendChild(script);
-    });
-  }
-
-  async function api(apiName, extra={}){
-    const tenant = {};
-    if (tenantSucursal) tenant.suc = tenantSucursal;
-    if (tenantToken) tenant.t = tenantToken;
-    const data = await jsonp(API_URL, Object.assign({api:apiName}, tenant, extra));
-    if (data && data.error) throw new Error(data.message || 'Error de API');
-    return data;
-  }
-
-  function buildSucursalAgg(rows){
-    const map = new Map();
-    rows.forEach(r => {
-      const k = r.sucursal || '(SIN SUCURSAL)';
-      if(!map.has(k)) map.set(k,{sucursal:k, ventas:0, docs:new Set(), gar:0, pol:0, garCant:0, polCant:0});
-      const a = map.get(k);
-      a.ventas += Number(r.total || 0);
-      a.docs.add(r.nroComprobante);
-      if(r.tipoOperacion === 'GAR'){ a.gar += Number(r.total || 0); a.garCant += 1; }
-      if(r.tipoOperacion === 'POL'){ a.pol += Number(r.total || 0); a.polCant += 1; }
-    });
-
-    return [...map.values()].map(x => ({
-      sucursal:x.sucursal,
-      ventas:x.ventas,
-      comprobantes:x.docs.size,
-      ticket:x.docs.size ? x.ventas / x.docs.size : 0,
-      garantias_importe:x.gar,
-      garantias_vs_fact_pct:x.docs.size ? (x.garCant / x.docs.size * 100) : 0,
-      polizas_importe:x.pol,
-      polizas_vs_venta_pct:x.ventas ? (x.pol / x.ventas * 100) : 0
-    })).sort((a,b)=>b.ventas-a.ventas);
-  }
-
-  function buildSeries(rows){
-    const map = new Map();
-    rows.forEach(r => {
-      const k = r.fecha;
-      if(!map.has(k)) map.set(k,{ventas:0, gar:0, pol:0});
-      const a = map.get(k);
-      a.ventas += Number(r.total || 0);
-      if(r.tipoOperacion === 'GAR') a.gar += Number(r.total || 0);
-      if(r.tipoOperacion === 'POL') a.pol += Number(r.total || 0);
-    });
-    return [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
-  }
-
-  function renderKPIs(){
-    const r = state.resumen?.data || {};
-    const docs = Number(r.comprobantes || r.facturas_total || 0);
-    const ticket = Number(r.ticket_promedio || (docs ? ((r.ventas_netas || 0) / docs) : 0));
-
-    $('#kVentas').textContent = fmtShort(r.ventas_netas || 0);
-    $('#kObj').textContent = r.cumplimiento_objetivo_pct != null ? fmtPct(r.cumplimiento_objetivo_pct,1) : 'n/d';
-    $('#kDocs').textContent = fmtNum(docs);
-    $('#kTicket').textContent = fmtMoney(ticket);
-    $('#kGar').textContent = fmtShort(r.garantias_importe || 0);
-    $('#kGarFac').textContent = fmtPct(r.garantias_vs_facturas_pct || 0,1);
-    $('#kGarVta').textContent = fmtPct(r.garantias_vs_venta_pct || 0,2);
-    $('#kPol').textContent = fmtShort(r.polizas_importe || 0);
-    $('#kPolCant').textContent = fmtNum(r.polizas_cantidad || 0);
-    $('#kPolVta').textContent = fmtPct(r.polizas_vs_venta_pct || 0,2);
-  }
-
-  function renderResumen(){
-    const rows = state.ventasDetalle || [];
-    const series = buildSeries(rows);
-    const topSuc = (state.sucursalesAgg && state.sucursalesAgg.length ? state.sucursalesAgg : buildSucursalAgg(rows)).slice(0,6);
-    const topVen = (state.vendedores || []).slice(0,6);
-
-    $('#topSucursales').innerHTML = topSuc.length ? topSuc.map(r => `
-      <div class="item">
-        <div class="itemTop"><strong>${esc(r.sucursal)}</strong><span>${fmtShort(r.ventas)}</span></div>
-        <div class="bar"><div class="fill" style="width:${Math.min(100, Math.max(8, (r.polizas_vs_venta_pct || 0) * 10 + 10))}%"></div></div>
-        <div class="meta">Comprobantes ${fmtNum(r.comprobantes)} · Garantías ${fmtShort(r.garantias_importe)} · Ticket ${fmtMoney(r.ticket)}</div>
-      </div>`).join('') : '<div class="item"><div class="meta">Sin datos para el filtro aplicado.</div></div>';
-
-    $('#topVendedores').innerHTML = topVen.length ? topVen.map(r => `
-      <div class="item">
-        <div class="itemTop"><strong>${esc(r.vendedor)}</strong><span>${fmtShort(r.ventas_netas)}</span></div>
-        <div class="bar"><div class="fill" style="width:${Math.min(100, Math.max(8, (r.garantias_vs_venta_pct || 0) * 10 + 10))}%"></div></div>
-        <div class="meta">% Gar/Vta ${fmtPct(r.garantias_vs_venta_pct || 0,2)} · Seguros ${fmtShort(r.polizas_importe || 0)}</div>
-      </div>`).join('') : '<div class="item"><div class="meta">Sin vendedores para el filtro aplicado.</div></div>';
-
-    if(state.charts.ventas) state.charts.ventas.destroy();
-    state.charts.ventas = new Chart($('#chVentas'), {
-      type:'bar',
-      data:{
-        labels:series.map(x=>x[0]),
-        datasets:[{
-          label:'Ventas netas',
-          data:series.map(x=>x[1].ventas),
-          backgroundColor:'#6ec1d5',
-          borderRadius:4
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{
-          x:{ticks:{color:'#6f8898'}, grid:{display:false}},
-          y:{ticks:{color:'#6f8898', callback:v=>fmtShort(v)}, grid:{color:'#e8eef3'}}
-        }
-      }
-    });
-
-    const r = state.resumen?.data || {};
-    if(state.charts.mix) state.charts.mix.destroy();
-    state.charts.mix = new Chart($('#chMix'), {
-      type:'doughnut',
-      data:{
-        labels:['Garantías $','Seguros $'],
-        datasets:[{
-          data:[r.garantias_importe || 0, r.polizas_importe || 0],
-          backgroundColor:['#d28b12','#1f9d62'],
-          borderWidth:0
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        cutout:'66%',
-        plugins:{legend:{position:'bottom', labels:{color:'#6f8898'}}}
-      }
-    });
-  }
-
-  function renderSucursales(){
-    const data = state.sucursalesAgg && state.sucursalesAgg.length ? state.sucursalesAgg : buildSucursalAgg(state.ventasDetalle || []);
-    $('#tbSucursales').innerHTML = data.length ? data.map(r => `
-      <tr>
-        <td>${esc(r.sucursal)}</td>
-        <td class="r">${fmtShort(r.ventas)}</td>
-        <td class="r">${fmtNum(r.comprobantes)}</td>
-        <td class="r">${fmtMoney(r.ticket)}</td>
-        <td class="r">${fmtShort(r.garantias_importe)}</td>
-        <td class="r">${fmtPct(r.garantias_vs_fact_pct,1)}</td>
-        <td class="r">${fmtShort(r.polizas_importe)}</td>
-        <td class="r">${fmtPct(r.polizas_vs_venta_pct,2)}</td>
-        <td>${badgeEstado(null)}</td>
-      </tr>`).join('') : `<tr><td colspan="9">Sin datos para el filtro aplicado.</td></tr>`;
-  }
-
-  function renderVendedores(){
-    const data = state.vendedores || [];
-
-    $('#tbVendedores').innerHTML = data.length ? data.map(r => `
-      <tr>
-        <td>${esc(r.vendedor)}</td>
-        <td>${esc((r.sucursales || []).join(', '))}</td>
-        <td class="r">${fmtShort(r.ventas_netas || 0)}</td>
-        <td class="r">${fmtNum(r.comprobantes || 0)}</td>
-        <td class="r">${fmtShort(r.garantias_importe || 0)}</td>
-        <td class="r">${fmtPct(r.garantias_vs_venta_pct || 0,2)}</td>
-        <td class="r">${fmtShort(r.polizas_importe || 0)}</td>
-        <td class="r">${fmtPct(r.polizas_vs_venta_pct || 0,2)}</td>
-      </tr>`).join('') : `<tr><td colspan="8">Sin datos para el filtro aplicado.</td></tr>`;
-
-    const top = data.slice(0,12).reverse();
-    if(state.charts.vendedores) state.charts.vendedores.destroy();
-    state.charts.vendedores = new Chart($('#chVendedores'), {
-      type:'bar',
-      data:{
-        labels:top.map(x=>x.vendedor),
-        datasets:[{
-          label:'Ventas',
-          data:top.map(x=>x.ventas_netas || 0),
-          backgroundColor:'#2f8ea8',
-          borderRadius:6
-        }]
-      },
-      options:{
-        indexAxis:'y',
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{
-          x:{ticks:{color:'#6f8898', callback:v=>fmtShort(v)}, grid:{color:'#e8eef3'}},
-          y:{ticks:{color:'#516a79'}, grid:{display:false}}
-        }
-      }
-    });
-
-    $('#insightsVendedores').innerHTML = data.slice(0,5).map(r => `
-      <div class="item">
-        <div class="itemTop"><strong>${esc(r.vendedor)}</strong><span>${fmtPct(r.garantias_vs_venta_pct || 0,2)}</span></div>
-        <div class="meta">Ventas ${fmtShort(r.ventas_netas || 0)} · Seguros ${fmtShort(r.polizas_importe || 0)} · Comprobantes ${fmtNum(r.comprobantes || 0)}</div>
-      </div>`).join('') || '<div class="item"><div class="meta">Sin datos.</div></div>';
-  }
-
-  function renderProductos(){
-    const data = state.productos || [];
-
-    $('#tbProductos').innerHTML = data.length ? data.map(r => `
-      <tr>
-        <td>${esc(r.sucursal || '')}</td>
-        <td>${esc(r.sku || '')}</td>
-        <td>${esc(r.descripcion || '')}</td>
-        <td>${esc(r.tipo || '')}</td>
-        <td class="r">${fmtNum(r.ranking_unidades || 0)}</td>
-        <td class="r">${fmtShort(r.ranking_importe || 0)}</td>
-        <td class="r">${fmtNum(r.stock_disponible || 0)}</td>
-        <td class="r">${fmtNum(r.stock_proyectado || 0)}</td>
-        <td class="r">${r.cobertura_dias == null ? 'n/d' : fmtNum(r.cobertura_dias)}</td>
-        <td>${esc(r.deposito_ranking || '-')}</td>
-        <td>${badgeStock(r)}</td>
-      </tr>`).join('') : `<tr><td colspan="11">Sin datos para el filtro aplicado.</td></tr>`;
-
-    const top = data.slice(0,12).reverse();
-    if(state.charts.productos) state.charts.productos.destroy();
-    state.charts.productos = new Chart($('#chProductos'), {
-      type:'bar',
-      data:{
-        labels:top.map(x=>x.sku),
-        datasets:[
-          {label:'Stock disponible', data:top.map(x=>x.stock_disponible || 0), backgroundColor:'#1f9d62', borderRadius:6},
-          {label:'Stock proyectado', data:top.map(x=>x.stock_proyectado || 0), backgroundColor:'#d28b12', borderRadius:6}
-        ]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{legend:{labels:{color:'#6f8898'}}},
-        scales:{
-          x:{ticks:{color:'#516a79'}, grid:{display:false}},
-          y:{ticks:{color:'#6f8898'}, grid:{color:'#e8eef3'}}
-        }
-      }
-    });
-
-    const quiebre = data.filter(r => (r.flag_quiebre || 0) === 1).slice(0,6);
-    const cobertura = [...data]
-      .filter(r => r.cobertura_dias != null)
-      .sort((a,b)=>(a.cobertura_dias ?? 999999) - (b.cobertura_dias ?? 999999))
-      .slice(0,6);
-    const insightRows = (quiebre.length ? quiebre : cobertura).slice(0,6);
-
-    $('#insightsProductos').innerHTML = insightRows.length ? insightRows.map(r => `
-      <div class="item">
-        <div class="itemTop"><strong>${esc(r.sku)} · ${esc(r.sucursal)}</strong><span>${(r.flag_quiebre || 0) === 1 ? 'Quiebre' : (r.cobertura_dias == null ? 'n/d' : fmtNum(r.cobertura_dias) + ' días')}</span></div>
-        <div class="meta">${esc(r.descripcion || '')} · Stock disp. ${fmtNum(r.stock_disponible || 0)} · Importe ranking ${fmtShort(r.ranking_importe || 0)}</div>
-      </div>`).join('') : '<div class="item"><div class="meta">Sin alertas para el filtro aplicado.</div></div>';
-  }
-
-  function renderArquitectura(){
-    $('#circuitoBox').innerHTML = [
-      ['1. Origen', 'CSV de ventas, ranking, ticket y stock publicados al backend actual.'],
-      ['2. Apps Script v3', 'Se conserva la base y se agregan endpoints más agregados.'],
-      ['3. Frontend profesional', 'Lee resumen, sucursales, ventas, vendedores y productos sin romper la lógica servidor.'],
-      ['4. Criterio', 'La vista prioriza tableros ejecutivos y alertas, no datasets crudos completos.'],
-      ['5. Escala', 'Se puede crecer con nuevos agregados más adelante, sin rehacer el frente.']
-    ].map(([t,d]) => `<div class="item"><div class="itemTop"><strong>${t}</strong></div><div class="meta">${d}</div></div>`).join('');
-
-    $('#escalaBox').innerHTML = [
-      'Observación válida: productos puede tener universos muy grandes. Esta versión usa top y alertas, no detalle irrestricto.',
-      'Ventas se pide con límite. Si el período es muy amplio, conviene resumir más y no pretender detalle completo en pantalla.',
-      'La v3 habilita endpoints agregados como sucursales, productos_top y productos_quiebre.',
-      'Mientras tanto, este front administra mejor el volumen y evita sobrecargar la experiencia de uso.',
-      'Conclusión: hoy el cuello potencial es el volumen de filas. El diseño y el consumo se adaptaron a esa realidad.'
-    ].map(t => `<div class="item"><div class="meta">${t}</div></div>`).join('');
-  }
-
-  function populateLookups(data){
-    const raw = data?.data || {sucursales:[], vendedores:[]};
-    state.lookups = {
-      sucursales: raw.sucursales || [],
-      vendedores: cleanVendorList(raw.vendedores || [])
-    };
-
-    const sucSel = $('#sucursal');
-    const venSel = $('#vendedor');
-    const currentSuc = tenantSucursal || sucSel.value;
-    const currentVen = normVendorName(venSel.value);
-
-    sucSel.innerHTML = '<option value="">Todas</option>' + (state.lookups.sucursales || []).map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
-    venSel.innerHTML = '<option value="">Todos</option>' + state.lookups.vendedores.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
-
-    if(currentSuc) sucSel.value = currentSuc;
-    if(currentVen && state.lookups.vendedores.includes(currentVen)) venSel.value = currentVen;
-    if(tenantSucursal){
-      sucSel.value = tenantSucursal;
-      sucSel.disabled = true;
-    }
-  }
-
-  async function loadHealth(){
-    const h = await api('health');
-    state.health = h;
-
-    const archivos = h?.archivos || {};
-    const archivosMal = Object.values(archivos).some(x => !x || x.existe !== true);
-
-    $('#healthTag').textContent = (h && h.error === false && !archivosMal) ? 'ok' : 'revisar';
-    $('#modoTag').textContent = h.mode || 'n/d';
-
-    if(h?.error || archivosMal){
-      setBanner('Health reportó problemas en archivos o configuración.', 'error');
-    }
-  }
-
-  async function loadLookups(){
-    const f = activeFilters();
-    try{
-      const data = await api('lookups', {scope:'ambos', sucursal:f.sucursal || ''});
-      populateLookups(data);
-    }catch(err){
-      setBanner('No se pudieron cargar listas de sucursales/vendedores: ' + err.message, 'error');
-    }
-  }
-
-  async function refreshAll(){
-    clearBanner();
-    updateFilterText();
-    const f = activeFilters();
-
-    try{
-      const resumenParams = {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, vendedor:f.vendedor};
-      if (f.objetivo != null) resumenParams.objetivo = f.objetivo;
-
-      const [resumen, sucursales, ventas, vendedores, productos] = await Promise.all([
-        api('resumen', resumenParams),
-        api('sucursales', {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, vendedor:f.vendedor, limit:100}),
-        api('ventas', {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, vendedor:f.vendedor, q:f.qProducto, limit:12000}),
-        api('vendedores', {desde:f.desde, hasta:f.hasta, sucursal:f.sucursal, q:f.vendedor, ordenar:'ventas', limit:200}),
-        f.soloQuiebre
-          ? api('productos_quiebre', {sucursal:f.sucursal, q:f.qProducto, limit:120})
-          : api('productos_top', {sucursal:f.sucursal, q:f.qProducto, ordenar:'importe', limit:120})
-      ]);
-
-      state.resumen = resumen;
-      state.sucursalesAgg = sucursales.data || [];
-      state.ventasDetalle = ventas.data || [];
-      state.vendedores = (vendedores.data || []).filter(r => isAllowedVendor(r.vendedor));
-      state.productos = productos.data || [];
-
-      renderKPIs();
-      renderResumen();
-      renderSucursales();
-      renderVendedores();
-      renderProductos();
-      renderArquitectura();
-
-      if(ventas.truncated){
-        setBanner('La vista de ventas fue truncada por límite. El tablero sigue funcionando, pero para análisis muy amplios conviene resumir más.', 'error');
-      } else if(state.health && state.health.error === false){
-        setBanner('Datos actualizados correctamente.', 'ok');
-      }
-    }catch(err){
-      setBanner(err.message || 'No se pudo actualizar el tablero.', 'error');
-      console.error(err);
-    }
-  }
-
-  function closeMobileSidebar(){
-    const sidebar = $('#sidebar');
-    const overlay = $('#mobileOverlay');
-    if(sidebar) sidebar.classList.remove('open');
-    if(overlay) overlay.classList.remove('show');
-  }
-
-  function openMobileSidebar(){
-    const sidebar = $('#sidebar');
-    const overlay = $('#mobileOverlay');
-    if(sidebar) sidebar.classList.add('open');
-    if(overlay) overlay.classList.add('show');
-  }
-
-  function wireMobileDrawer(){
-    const btnOpen = $('#mobileMenuBtn');
-    const btnClose = $('#sideCloseBtn');
-    const overlay = $('#mobileOverlay');
-
-    if(btnOpen){
-      btnOpen.addEventListener('click', openMobileSidebar);
-    }
-
-    if(btnClose){
-      btnClose.addEventListener('click', closeMobileSidebar);
-    }
-
-    if(overlay){
-      overlay.addEventListener('click', closeMobileSidebar);
-    }
-
-    window.addEventListener('resize', () => {
-      if(window.innerWidth > 760){
-        closeMobileSidebar();
-      }
-    });
-  }
-
-  function wireViews(){
-    const meta = {
-      resumen:['Resumen Ejecutivo','Lectura comercial compacta, profesional y orientada a decisión.'],
-      sucursales:['Sucursales','Comparativa clara por local.'],
-      vendedores:['Vendedores','Desempeño individual y cobertura comercial.'],
-      productos:['Productos & Stock','Top productos y alertas, sin sobrecargar el frontend.'],
-      arquitectura:['Arquitectura','Criterio técnico y observaciones de escalabilidad.']
-    };
-
-    $$('.nav button').forEach(btn => btn.addEventListener('click', () => {
-      $$('.nav button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      $$('.view').forEach(v=>v.classList.remove('active'));
-      $('#view-' + btn.dataset.view).classList.add('active');
-      $('#pageTitle').textContent = meta[btn.dataset.view][0];
-      $('#pageDesc').textContent = meta[btn.dataset.view][1];
-      state.currentView = btn.dataset.view;
-
-      if(window.innerWidth <= 760){
-        closeMobileSidebar();
-      }
-    }));
-  }
-
-  function wireFilters(){
-    $('#periodo').addEventListener('change', syncDatesByPeriod);
-
-    $('#btnAplicar').addEventListener('click', async () => {
-      await loadLookups();
-      await refreshAll();
-      if(window.innerWidth <= 760){
-        closeMobileSidebar();
-      }
-    });
-
-    $('#btnLimpiar').addEventListener('click', async () => {
-      $('#periodo').value = 'mes';
-      syncDatesByPeriod();
-      $('#sucursal').value = '';
-      if(!tenantSucursal) $('#sucursal').disabled = false;
-      $('#vendedor').value = '';
-      $('#qProducto').value = '';
-      $('#objetivo').value = '';
-      $('#soloQuiebre').checked = false;
-      updateFilterText();
-      await loadLookups();
-      await refreshAll();
-      if(window.innerWidth <= 760){
-        closeMobileSidebar();
-      }
-    });
-
-    $('#soloQuiebre').addEventListener('change', refreshAll);
-  }
-
-  async function init(){
-    wireViews();
-    wireFilters();
-    wireMobileDrawer();
-    syncDatesByPeriod();
-    updateFilterText();
-
-    if(!API_URL){
-      setBanner('API no configurada correctamente.', 'error');
-      return;
-    }
-
-    try{
-      await loadHealth();
-      await loadLookups();
-      await refreshAll();
-    }catch(err){
-      setBanner(err.message || 'Falló la inicialización del tablero.', 'error');
-      console.error(err);
-    }
-  }
-
-  init();
-})();
+init();
 </script>
 </body>
 </html>
