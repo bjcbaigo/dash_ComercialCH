@@ -11,8 +11,8 @@
   <style>
     :root{
       --bg:#07090f; --bg2:#0d1018; --card:#111520; --card2:#161b28; --line:#1e2535; --line2:#252d40;
-      --text:#e8edf8; --muted:#7a86a3; --muted2:#98a4bf; --cyan:#00c8b4; --cyan2:#008f80;
-      --purple:#7c5cfc; --blue:#3b82f6; --amber:#f59e0b; --green:#22c55e; --red:#ef4444;
+      --text:#e8edf8; --muted:#7a86a3; --muted2:#98a4bf; --cyan:#22d3c5; --cyan2:#0f766e;
+      --purple:#14b8a6; --blue:#06b6d4; --amber:#f59e0b; --green:#34d399; --red:#ef4444;
       --sans:'Outfit',sans-serif; --mono:'JetBrains Mono',monospace; --radius:16px;
       --shadow:0 14px 40px rgba(0,0,0,.22);
     }
@@ -44,7 +44,7 @@
     }
     .btn{cursor:pointer}
     .btn:hover,.select:focus,.input:focus{border-color:var(--cyan);color:var(--cyan)}
-    .btn.primary{background:rgba(0,200,180,.12);border-color:rgba(0,200,180,.38);color:var(--cyan)}
+    .btn.primary{background:rgba(34,211,197,.16);border-color:rgba(34,211,197,.42);color:var(--cyan);box-shadow:0 0 0 1px rgba(34,211,197,.05), 0 8px 24px rgba(34,211,197,.08)}
     .container{max-width:1680px;margin:0 auto;padding:1rem}
     .toolbar{display:grid;grid-template-columns:1.25fr auto auto auto;gap:.7rem;align-items:center;margin-bottom:1rem}
     .period-strip{display:flex;gap:.38rem;overflow:auto;padding-bottom:.15rem;scrollbar-width:thin}
@@ -61,8 +61,8 @@
     .kpi{padding:1rem;position:relative}
     .kpi::before{content:'';position:absolute;left:0;right:0;top:0;height:3px}
     .kpi.c0::before{background:linear-gradient(90deg,var(--cyan),var(--cyan2))}
-    .kpi.c1::before{background:linear-gradient(90deg,var(--purple),#5b21b6)}
-    .kpi.c2::before{background:linear-gradient(90deg,var(--blue),#1d4ed8)}
+    .kpi.c1::before{background:linear-gradient(90deg,#2dd4bf,#0f766e)}
+    .kpi.c2::before{background:linear-gradient(90deg,#67e8f9,#0891b2)}
     .kpi.c3::before{background:linear-gradient(90deg,var(--amber),#d97706)}
     .kpi.c4::before{background:linear-gradient(90deg,var(--green),#15803d)}
     .kpi .label{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
@@ -87,7 +87,7 @@
     .mini{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:.85rem}
     .mini .label{font-size:.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
     .mini .value{margin-top:.35rem;font:800 1.1rem var(--mono)}
-    .mini.cy .value{color:var(--cyan)} .mini.pu .value{color:var(--purple)}
+    .mini.cy .value{color:var(--cyan)} .mini.pu .value{color:#2dd4bf}
     .legend-list,.stock-list,.obj-list{display:flex;flex-direction:column;gap:.45rem}
     .legend-item,.stock-item,.obj-item{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:.75rem .82rem}
     .legend-row,.stock-top,.obj-top{display:flex;align-items:center;justify-content:space-between;gap:.65rem}
@@ -375,11 +375,11 @@
 
 <script>
 const CONFIG = {
-  API_BASE: 'https://script.google.com/macros/s/AKfycbzS1V4rbhjIUg-w_GXYNmZKQOdVrRZQx0SoIGofCqRLWzOxMVbqlygEuWgoN36cuKXhKQ/exec'
+  API_BASE: 'PEGAR_AQUI_URL_WEBAPP_APPS_SCRIPT',
   DEFAULT_PERIOD: 'month'
 };
 
-const COLORS = ['#00c8b4','#7c5cfc','#3b82f6','#f59e0b','#22c55e','#ef4444','#14b8a6','#f97316','#6366f1','#e879f9'];
+const COLORS = ['#22d3c5','#14b8a6','#06b6d4','#67e8f9','#2dd4bf','#0f766e','#34d399','#99f6e4','#0891b2','#5eead4'];
 
 const state = {
   period: CONFIG.DEFAULT_PERIOD,
@@ -506,7 +506,7 @@ function renderEvolucion(){
   const ctx = document.getElementById('chartEvo');
   state.charts.evo = new Chart(ctx, {
     type:'line',
-    data:{ labels: grouped.labels, datasets:[{ label:'Ventas', data: grouped.values, borderColor:'#00c8b4', backgroundColor:'rgba(0,200,180,.18)', tension:.28, fill:true, pointRadius:2, pointHoverRadius:4 }] },
+    data:{ labels: grouped.labels, datasets:[{ label:'Ventas', data: grouped.values, borderColor:'#22d3c5', backgroundColor:'rgba(34,211,197,.18)', tension:.28, fill:true, pointRadius:2, pointHoverRadius:4 }] },
     options: baseChartOptions({ currency:true })
   });
 }
@@ -554,7 +554,7 @@ function renderGP(){
   const ctx = document.getElementById('chartGP');
   state.charts.gp = new Chart(ctx, {
     type:'bar',
-    data:{ labels:['Garantías','Pólizas'], datasets:[{ data:[Number(k.garantias||0), Number(k.polizas||0)], backgroundColor:['rgba(0,200,180,.65)','rgba(124,92,252,.65)'], borderColor:['#00c8b4','#7c5cfc'], borderWidth:1.5, borderRadius:8 }] },
+    data:{ labels:['Garantías','Pólizas'], datasets:[{ data:[Number(k.garantias||0), Number(k.polizas||0)], backgroundColor:['rgba(34,211,197,.65)','rgba(20,184,166,.65)'], borderColor:['#22d3c5','#14b8a6'], borderWidth:1.5, borderRadius:8 }] },
     options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => fmtMoney(c.raw) } } }, scales:{ x:{ ticks:{ color:'#9aa7c0' }, grid:{ display:false } }, y:{ ticks:{ color:'#9aa7c0', callback:v => fmtMoney(v) }, grid:{ color:'rgba(255,255,255,.06)' } } } }
   });
 }
