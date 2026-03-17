@@ -631,14 +631,30 @@ async function refreshAll(){
   updateStaticLabels();
   try{
     await refreshHealth();
-    const [resumen, ranking, stock] = await Promise.all([
-      apiFetch('resumen'),
-      apiFetch('ranking', { useRange:false }),
-      apiFetch('stock', { useRange:false, soloQuiebre:1 })
-    ]);
-    state.resumen = resumen;
-    state.ranking = ranking;
-    state.stock = stock;
+    const results = await Promise.allSettled([
+  apiFetch('resumen'),
+  apiFetch('ranking', { useRange:false }),
+  apiFetch('stock', { useRange:false, soloQuiebre:1 })
+]);
+
+const resumenRes = results[0];
+const rankingRes = results[1];
+const stockRes   = results[2];
+
+if (resumenRes.status !== 'fulfilled') {
+  throw new Error(resumenRes.reason?.message || 'Falló api=resumen');
+}
+
+state.resumen = resumenRes.value;
+state.ranking = rankingRes.status === 'fulfilled' ? rankingRes.value : { data: [] };
+state.stock   = stockRes.status === 'fulfilled' ? stockRes.value : { data: [], fecha_refresco: null };
+
+if (rankingRes.status !== 'fulfilled') {
+  console.warn('api=ranking falló:', rankingRes.reason);
+}
+if (stockRes.status !== 'fulfilled') {
+  console.warn('api=stock falló:', stockRes.reason);
+}
     renderKpis();
     renderEvolucion();
     renderDonut();
