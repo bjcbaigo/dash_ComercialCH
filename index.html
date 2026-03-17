@@ -618,18 +618,34 @@ function renderObjetivos(){
   }).join('') || '<div class="empty">Sin datos de adherencia.</div>';
 }
 
-function renderArticulos(){
-  const rows = safeArr(state.ranking?.data || state.resumen?.topArticulos || []);
-  const tbody = document.getElementById('tbodyArticulos');
-  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Sin ranking de artículos.</div></td></tr>'; return; }
-  const sorted = rows.slice().sort((a,b) => Number(b.importe||0) - Number(a.importe||0)).slice(0,40);
-  tbody.innerHTML = sorted.map((r,i) => `<tr>
-    <td><span class="rank ${i < 3 ? 'top' : ''}">${i+1}</span></td>
-    <td class="mono">${escapeHtml(r.sku || '')}</td>
-    <td>${escapeHtml(r.descripcion || '')}</td>
-    <td class="r mono">${fmtNum(r.unidades || 0)}</td>
-    <td class="r mono">${fmtMoney(r.importe || 0)}</td>
-  </tr>`).join('');
+function renderTopArticulos() {
+  const tbody = document.getElementById('topArticulosBody');
+  if (!tbody) return;
+
+  const rows = Array.isArray(state?.resumen?.topArticulos) && state.resumen.topArticulos.length
+    ? state.resumen.topArticulos
+    : (Array.isArray(state?.ranking?.data) ? state.ranking.data : []);
+
+  if (!rows.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty-box">Sin ranking de artículos.</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = rows.slice(0, 10).map((r, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${escapeHtml(r.sku || '')}</td>
+      <td>${escapeHtml(r.descripcion || '')}</td>
+      <td>${fmtNum((r.unidades ?? r.cantidad ?? 0))}</td>
+      <td>${fmtMoney((r.importe ?? r.total ?? 0))}</td>
+    </tr>
+  `).join('');
 }
 
 function renderStock(){
