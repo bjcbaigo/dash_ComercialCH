@@ -619,7 +619,7 @@ function renderObjetivos(){
 }
 
 function renderTopArticulos() {
-  const tbody = document.getElementById('topArticulosBody');
+  const tbody = document.getElementById('tbodyArticulos');
   if (!tbody) return;
 
   const rows = Array.isArray(state?.resumen?.topArticulos) && state.resumen.topArticulos.length
@@ -630,7 +630,7 @@ function renderTopArticulos() {
     tbody.innerHTML = `
       <tr>
         <td colspan="5">
-          <div class="empty-box">Sin ranking de artículos.</div>
+          <div class="empty">Sin ranking de artículos.</div>
         </td>
       </tr>
     `;
@@ -639,11 +639,11 @@ function renderTopArticulos() {
 
   tbody.innerHTML = rows.slice(0, 10).map((r, i) => `
     <tr>
-      <td>${i + 1}</td>
+      <td><span class="rank ${i < 3 ? 'top' : ''}">${i + 1}</span></td>
       <td>${escapeHtml(r.sku || '')}</td>
       <td>${escapeHtml(r.descripcion || '')}</td>
-      <td>${fmtNum((r.unidades ?? r.cantidad ?? 0))}</td>
-      <td>${fmtMoney((r.importe ?? r.total ?? 0))}</td>
+      <td class="r mono">${fmtNum((r.unidades ?? r.cantidad ?? 0))}</td>
+      <td class="r mono">${fmtMoney((r.importe ?? r.total ?? 0))}</td>
     </tr>
   `).join('');
 }
