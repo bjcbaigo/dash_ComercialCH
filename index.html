@@ -398,7 +398,7 @@ function safeArr(v){ return Array.isArray(v) ? v : []; }
 function escapeHtml(s){ return String(s||'').replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 function isValidIsoDate(s){ return /^\d{4}-\d{2}-\d{2}$/.test(String(s||'')); }
 
-function getApiBase(){ return (CONFIG.API_BASE || '').trim(); }
+function getApiBase(){ return (https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec || '').trim(); }
 function buildApiUrl(api, extra={}){
   const base = getApiBase();
   if(!base || base.includes('https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec')) throw new Error('Falta configurar la URL del Apps Script en CONFIG.API_BASE o en window.CHEMES_API_BASE');
