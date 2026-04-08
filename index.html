@@ -788,6 +788,203 @@
       thead th.col-garimp,
       tbody td.col-garimp { display: none; }
     }
+
+    /* ══════════════════════════════════════════════════════
+       PANEL ÚNICO — KPI strip compacto + menú + vista
+    ══════════════════════════════════════════════════════ */
+
+    /* KPI STRIP COMPACTO — siempre visible arriba */
+    .kpi-strip-compact {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+      gap: .5rem;
+      padding: .6rem 1.5rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--sh-sm);
+    }
+    .kc {
+      display: flex; flex-direction: column; gap: .1rem;
+      padding: .45rem .75rem;
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: var(--r-md); position: relative; overflow: hidden;
+    }
+    .kc::before {
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 3px;
+    }
+    .kc.ventas::before { background: linear-gradient(180deg,var(--brand),var(--teal)); }
+    .kc.ticket::before { background: linear-gradient(180deg,#7c3aed,#a855f7); }
+    .kc.unid::before   { background: linear-gradient(180deg,var(--teal),#34d399); }
+    .kc.comp::before   { background: linear-gradient(180deg,#f59e0b,#fbbf24); }
+    .kc.gar::before    { background: linear-gradient(180deg,var(--gar),#2dd4bf); }
+    .kc.pol::before    { background: linear-gradient(180deg,var(--pol),#60a5fa); }
+    .kc-lbl {
+      font-size: .55rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--muted);
+    }
+    .kc-val {
+      font-family: var(--mono); font-size: .95rem; font-weight: 600;
+      color: var(--text); letter-spacing: -.02em; line-height: 1.1;
+    }
+    .kc.ventas .kc-val { font-size: 1.1rem; color: var(--brand3); }
+    .kc.gar    .kc-val { color: var(--gar); }
+    .kc.pol    .kc-val { color: var(--pol); }
+    .kc-sub {
+      font-size: .58rem; color: var(--muted);
+      display: flex; align-items: center; gap: .25rem; flex-wrap: wrap;
+      margin-top: .05rem;
+    }
+
+    /* LAYOUT PANEL */
+    .panel-layout {
+      display: flex; gap: 0;
+      height: calc(100vh - var(--hdr-offset, 160px));
+      overflow: hidden;
+    }
+
+    /* MENÚ LATERAL */
+    .panel-nav {
+      width: 200px; flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto; overflow-x: hidden;
+      scrollbar-width: thin;
+    }
+    .nav-section-title {
+      font-size: .55rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted2);
+      padding: .75rem .9rem .3rem;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: .55rem;
+      padding: .6rem .9rem;
+      cursor: pointer; transition: all .15s;
+      border-left: 3px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      border-top: none; border-right: none; border-bottom: none;
+      font-family: var(--sans); text-align: left; width: 100%;
+    }
+    .nav-item:hover { background: var(--surf2); }
+    .nav-item.active {
+      background: var(--brandlt);
+      border-left-color: var(--brand);
+    }
+    .nav-icon { font-size: .9rem; flex-shrink: 0; }
+    .nav-label { font-size: .73rem; font-weight: 600; color: var(--text2); }
+    .nav-item.active .nav-label { color: var(--brand2); font-weight: 700; }
+    .nav-divider { height: 1px; background: var(--border); margin: .35rem .9rem; }
+
+    /* ÁREA DE VISTA */
+    .panel-view {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: .85rem 1.1rem;
+      scrollbar-width: thin;
+    }
+    .panel-view::-webkit-scrollbar { width: 5px; }
+    .panel-view::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 999px; }
+
+    /* vistas: ocultas por defecto */
+    .vista { display: none; }
+    .vista.active { display: block; }
+
+    /* vista KPIs: grid de insights */
+    .insights-compact {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .55rem; margin-bottom: .75rem;
+    }
+    .insight-card-sm {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: .7rem .85rem;
+      display: flex; gap: .6rem; align-items: center;
+    }
+    .ics-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .ics-body {}
+    .ics-label { font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .ics-val   { font-family: var(--display); font-size: .9rem; font-weight: 700; color: var(--text); margin-top: .1rem; }
+    .ics-sub   { font-size: .62rem; color: var(--muted); }
+
+    /* MOBILE NAV — bottom bar en lugar de sidebar */
+    .panel-nav-mobile {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -4px 16px rgba(15,34,49,.1);
+      z-index: 50;
+      overflow-x: auto; overflow-y: hidden;
+      scrollbar-width: none;
+    }
+    .panel-nav-mobile::-webkit-scrollbar { display: none; }
+    .panel-nav-mobile-inner {
+      display: flex; gap: 0;
+      min-width: min-content;
+    }
+    .nav-mob-item {
+      display: flex; flex-direction: column; align-items: center; gap: .15rem;
+      padding: .55rem .8rem;
+      cursor: pointer; transition: all .15s;
+      border: none; background: transparent;
+      font-family: var(--sans); white-space: nowrap; flex-shrink: 0;
+      border-top: 2px solid transparent;
+    }
+    .nav-mob-item:hover { background: var(--surf2); }
+    .nav-mob-item.active {
+      border-top-color: var(--brand);
+      background: var(--brandlt);
+    }
+    .nav-mob-icon  { font-size: .95rem; }
+    .nav-mob-label { font-size: .6rem; font-weight: 700; color: var(--muted); }
+    .nav-mob-item.active .nav-mob-label { color: var(--brand); }
+
+    /* KPI strip compacto responsive */
+    @media (max-width: 900px) {
+      .kpi-strip-compact {
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: .5rem 1rem;
+      }
+      .kc.ventas { grid-column: 1 / -1; }
+      .kc-val { font-size: .88rem; }
+      .kc.ventas .kc-val { font-size: 1rem; }
+    }
+    @media (max-width: 560px) {
+      .kpi-strip-compact {
+        grid-template-columns: 1fr 1fr;
+        padding: .45rem .85rem;
+        gap: .38rem;
+      }
+      .kc.ventas { grid-column: 1 / -1; }
+      .kc { padding: .4rem .6rem; }
+      .kc-val { font-size: .82rem; }
+      .kc.ventas .kc-val { font-size: .95rem; }
+    }
+
+    /* Panel layout responsive */
+    @media (max-width: 768px) {
+      .panel-nav { display: none; }
+      .panel-nav-mobile { display: block; }
+      .panel-layout {
+        height: calc(100vh - var(--hdr-offset, 200px));
+        padding-bottom: 56px; /* espacio para nav bottom */
+      }
+      .panel-view { padding: .7rem .85rem; }
+    }
+    @media (min-width: 769px) {
+      .panel-nav-mobile { display: none; }
+    }
+
+    /* KPI strip compacto — reemplaza exec-kpis */
+    .exec-kpis { display: none !important; }
+    .section-label-panel {
+      font-family: var(--display); font-size: .75rem; font-weight: 700;
+      color: var(--text); margin-bottom: .6rem;
+    }
+    .section-subt-panel {
+      font-size: .63rem; color: var(--muted); margin-bottom: .75rem; margin-top: -.4rem;
+    }
   </style>
 </head>
 <body>
@@ -866,151 +1063,96 @@
   </div>
 </div>
 
-<!-- ══════════════ MAIN ══════════════ -->
-<main class="container">
-  <div id="errorBox" class="errorbox hidden"></div>
+<!-- ══════════════ MAIN PANEL ÚNICO ══════════════ -->
 
-  <!-- 1. EXECUTIVE KPIS -->
-  <div class="section-label">KPIs ejecutivos del período</div>
-  <div class="exec-kpis">
-    <div class="ekpi ventas">
-      <div class="ekpi-label">Ventas netas</div>
-      <div class="ekpi-val" id="kpiVentas">$0</div>
-      <div class="ekpi-sub">
-        Bruta: <b id="kpiBruta" style="font-family:var(--mono)">$0</b>
-        <span class="badge neu" id="kpiNCbadge">NC $0</span>
-      </div>
-    </div>
-    <div class="ekpi ticket">
-      <div class="ekpi-label">Ticket promedio</div>
-      <div class="ekpi-val" id="kpiTicket">$0</div>
-      <div class="ekpi-sub">Comprobantes: <b id="kpiComp" style="font-family:var(--mono)">0</b></div>
-    </div>
-    <div class="ekpi unid">
-      <div class="ekpi-label">Unidades vendidas</div>
-      <div class="ekpi-val" id="kpiUnid">0</div>
-      <div class="ekpi-sub">Movidas en el período</div>
-    </div>
-    <div class="ekpi comp">
-      <div class="ekpi-label">Intangibles / ventas</div>
-      <div class="ekpi-val" id="kpiIntangPct">0%</div>
-      <div class="ekpi-sub">GAR + POL sobre ventas netas</div>
-    </div>
-    <div class="ekpi gar">
-      <div class="ekpi-label">Garantías</div>
-      <div class="ekpi-val" id="kpiGar">$0</div>
-      <div class="ekpi-sub">
-        <span class="badge gar" id="kpiGarPct">0%</span>
-        Cant: <b id="kpiGarCant" style="font-family:var(--mono)">0</b>
-      </div>
-    </div>
-    <div class="ekpi pol">
-      <div class="ekpi-label">Seguros de vida</div>
-      <div class="ekpi-val" id="kpiPol">$0</div>
-      <div class="ekpi-sub">
-        <span class="badge pol" id="kpiPolPct">0%</span>
-        Cant: <b id="kpiPolCant" style="font-family:var(--mono)">0</b>
-      </div>
-    </div>
+<!-- KPI strip compacto — siempre visible -->
+<div class="kpi-strip-compact" id="kpiStrip">
+  <div class="kc ventas">
+    <div class="kc-lbl">Ventas netas</div>
+    <div class="kc-val" id="kpiVentas">$0</div>
+    <div class="kc-sub">Bruta: <b id="kpiBruta" style="font-family:var(--mono)">$0</b> &nbsp;<span class="badge neu" id="kpiNCbadge">NC $0</span></div>
   </div>
-
-  <!-- 2. INSIGHTS -->
-  <div class="section-label">Inteligencia comercial</div>
-  <div class="insights-grid" id="insightsGrid">
-    <div class="insight-card"><div class="insight-icon">🏆</div><div class="insight-label">Sucursal líder</div><div class="insight-val" id="insLider">—</div><div class="insight-sub" id="insLiderSub">—</div></div>
-    <div class="insight-card"><div class="insight-icon">⚠️</div><div class="insight-label">Sucursal crítica</div><div class="insight-val" id="insCritica">—</div><div class="insight-sub" id="insCriticaSub">—</div></div>
-    <div class="insight-card"><div class="insight-icon">📈</div><div class="insight-label">Mayor crecimiento</div><div class="insight-val" id="insCrecimiento">—</div><div class="insight-sub" id="insCrecimientoSub">—</div></div>
-    <div class="insight-card"><div class="insight-icon">🎯</div><div class="insight-label">Mejor ticket promedio</div><div class="insight-val" id="insTicket">—</div><div class="insight-sub" id="insTicketSub">—</div></div>
+  <div class="kc ticket">
+    <div class="kc-lbl">Ticket prom.</div>
+    <div class="kc-val" id="kpiTicket">$0</div>
+    <div class="kc-sub">Comp: <b id="kpiComp">0</b></div>
   </div>
-
-  <!-- 3. SEMAFORO GERENCIAL -->
-  <div class="section-label">Semáforo gerencial por sucursal</div>
-  <div class="semaforo-grid" id="semaforoGrid"></div>
-
-  <!-- 4. TOP / BOTTOM -->
-  <div class="section-label">Extremos del período</div>
-  <div class="topbot-grid">
-    <div class="tb-card">
-      <div class="tb-card-head">
-        <div class="tb-head-title top-5">▲ Top 5 sucursales</div>
-        <span class="badge up">Mejor desempeño</span>
-      </div>
-      <div id="top5List"></div>
-    </div>
-    <div class="tb-card">
-      <div class="tb-card-head">
-        <div class="tb-head-title bot-5">▼ Bottom 5 sucursales</div>
-        <span class="badge dn">Atención gerencial</span>
-      </div>
-      <div id="bot5List"></div>
-    </div>
+  <div class="kc unid">
+    <div class="kc-lbl">Unidades</div>
+    <div class="kc-val" id="kpiUnid">0</div>
+    <div class="kc-sub">en el período</div>
   </div>
-
-  <!-- 5. EVOLUCIÓN + DONUT -->
-  <div class="section-label">Evolución del período</div>
-  <div class="grid-evo">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Evolución del período</div>
-          <div class="card-subt" id="evoSubt">Ventas netas</div>
-        </div>
-        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
-          <div class="ttabs" id="evoToggle">
-            <button class="ttab active" data-serie="ventas">Ventas</button>
-            <button class="ttab" data-serie="garantias">Garantías</button>
-            <button class="ttab" data-serie="polizas">Seguros</button>
-          </div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="chart-wrap"><canvas id="chartEvo"></canvas></div>
-      </div>
-    </div>
-
-    <div class="card" id="cardDonut">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Participación por sucursal</div>
-          <div class="card-subt" id="donutSubtitle">Top 7 por ventas</div>
-        </div>
-        <select class="mini-sel" id="donutMode">
-          <option value="ventas">Ventas</option>
-          <option value="garantias">Garantías</option>
-          <option value="polizas">Seguros</option>
-        </select>
-      </div>
-      <div class="card-body">
-        <div class="chart-wrap xs"><canvas id="chartDonut"></canvas></div>
-        <div class="donut-legend" id="donutLegend"></div>
-      </div>
-    </div>
+  <div class="kc comp">
+    <div class="kc-lbl">Intangibles</div>
+    <div class="kc-val" id="kpiIntangPct">0%</div>
+    <div class="kc-sub">GAR+POL / ventas</div>
   </div>
+  <div class="kc gar">
+    <div class="kc-lbl">Garantías</div>
+    <div class="kc-val" id="kpiGar">$0</div>
+    <div class="kc-sub"><span class="badge gar" id="kpiGarPct">0%</span> <b id="kpiGarCant">0</b> cant.</div>
+  </div>
+  <div class="kc pol">
+    <div class="kc-lbl">Seguros</div>
+    <div class="kc-val" id="kpiPol">$0</div>
+    <div class="kc-sub"><span class="badge pol" id="kpiPolPct">0%</span> <b id="kpiPolCant">0</b> cant.</div>
+  </div>
+</div>
 
-  <!-- 6. RANKING VISUAL -->
-  <div class="section-label">Ranking visual de sucursales</div>
-  <div class="grid-3">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Ranking por ventas netas</div>
-          <div class="card-subt">Barras comparativas · tendencia vs promedio</div>
-        </div>
-        <select class="mini-sel" id="rankMode">
-          <option value="ventas">Ventas</option>
-          <option value="garantias">Garantías</option>
-          <option value="polizas">Seguros</option>
-        </select>
+<div id="errorBox" class="errorbox hidden" style="margin:.5rem 1.5rem"></div>
+
+<!-- LAYOUT PANEL: sidebar + vista central -->
+<div class="panel-layout">
+
+  <!-- ── SIDEBAR DESKTOP ── -->
+  <nav class="panel-nav">
+    <div class="nav-section-title">Vistas</div>
+    <button class="nav-item active" data-vista="insights">
+      <span class="nav-icon">💡</span><span class="nav-label">Resumen ejecutivo</span>
+    </button>
+    <button class="nav-item" data-vista="semaforo">
+      <span class="nav-icon">🚦</span><span class="nav-label">Semáforo sucursales</span>
+    </button>
+    <button class="nav-item" data-vista="extremos">
+      <span class="nav-icon">📊</span><span class="nav-label">Extremos del período</span>
+    </button>
+    <div class="nav-divider"></div>
+    <div class="nav-section-title">Análisis</div>
+    <button class="nav-item" data-vista="evolucion">
+      <span class="nav-icon">📈</span><span class="nav-label">Evolución</span>
+    </button>
+    <button class="nav-item" data-vista="ranking">
+      <span class="nav-icon">🏅</span><span class="nav-label">Ranking sucursales</span>
+    </button>
+    <button class="nav-item" data-vista="tabla">
+      <span class="nav-icon">📋</span><span class="nav-label">Tabla detallada</span>
+    </button>
+    <div class="nav-divider"></div>
+    <div class="nav-section-title">Operativo</div>
+    <button class="nav-item" data-vista="articulos">
+      <span class="nav-icon">📦</span><span class="nav-label">Top artículos</span>
+    </button>
+    <button class="nav-item" data-vista="stock">
+      <span class="nav-icon">⚠️</span><span class="nav-label">Stock crítico</span>
+    </button>
+  </nav>
+
+  <!-- ── ÁREA DE VISTA CENTRAL ── -->
+  <div class="panel-view" id="panelView">
+
+    <!-- VISTA 1: Resumen ejecutivo / Insights -->
+    <div class="vista active" id="vista-insights">
+      <div class="section-label-panel">💡 Resumen ejecutivo</div>
+      <div class="section-subt-panel">Lectura rápida del período · indicadores clave de atención gerencial</div>
+      <div class="insights-compact">
+        <div class="insight-card-sm"><div class="ics-icon">🏆</div><div class="ics-body"><div class="ics-label">Sucursal líder</div><div class="ics-val" id="insLider">—</div><div class="ics-sub" id="insLiderSub">—</div></div></div>
+        <div class="insight-card-sm"><div class="ics-icon">⚠️</div><div class="ics-body"><div class="ics-label">Sucursal crítica</div><div class="ics-val" id="insCritica">—</div><div class="ics-sub" id="insCriticaSub">—</div></div></div>
+        <div class="insight-card-sm"><div class="ics-icon">📈</div><div class="ics-body"><div class="ics-label">Mayor crecimiento</div><div class="ics-val" id="insCrecimiento">—</div><div class="ics-sub" id="insCrecimientoSub">—</div></div></div>
+        <div class="insight-card-sm"><div class="ics-icon">🎯</div><div class="ics-body"><div class="ics-label">Mejor ticket prom.</div><div class="ics-val" id="insTicket">—</div><div class="ics-sub" id="insTicketSub">—</div></div></div>
       </div>
-      <div class="rank-bar-list" id="rankBarList"></div>
-    </div>
-
-    <div class="card" id="cardAdherencia">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Adherencia por sucursal</div>
-          <div class="card-subt">Participación relativa en el período</div>
-        </div>
+      <!-- Adherencia dentro de resumen -->
+      <div class="section-label-panel" id="cardAdherencia" style="margin-top:.5rem">Adherencia por sucursal</div>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
         <select class="mini-sel" id="objMode">
           <option value="ventas">Ventas</option>
           <option value="garantias">Garantías</option>
@@ -1019,79 +1161,202 @@
       </div>
       <div class="adh-list" id="objList"></div>
     </div>
-  </div>
 
-  <!-- 7. TABLA GERENCIAL COMPLETA -->
-  <div class="section-label">Desempeño detallado por sucursal</div>
-  <div class="full card" id="cardRankingSucursales">
-    <div class="card-head">
-      <div>
-        <div class="card-title">Tabla comparativa ejecutiva</div>
-        <div class="card-subt">Ventas · ticket · comprobantes · garantías · pólizas · tendencia vs promedio</div>
-      </div>
+    <!-- VISTA 2: Semáforo -->
+    <div class="vista" id="vista-semaforo">
+      <div class="section-label-panel">🚦 Semáforo gerencial por sucursal</div>
+      <div class="section-subt-panel">Clasificación automática según desempeño vs. promedio del período</div>
+      <div class="semaforo-grid" id="semaforoGrid"></div>
     </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Sucursal</th><th class="r">Ventas</th>
-            <th class="r col-ticket">Ticket</th><th class="r col-comp">Comp.</th>
-            <th class="r tgar">GAR %</th><th class="r tgar">GAR cant.</th>
-            <th class="r tpol">POL %</th><th class="r tpol">POL cant.</th>
-            <th class="r col-garimp">GAR $</th><th>Tendencia</th>
-          </tr>
-        </thead>
-        <tbody id="tbodySucursales"></tbody>
-      </table>
-    </div>
-  </div>
 
-  <!-- 8. ARTÍCULOS + STOCK -->
-  <div class="section-label">Artículos y stock operativo</div>
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <div class="card-title" id="titleRankingArt">Top artículos</div>
-          <div class="card-subt" id="rankingSubt">Ranking consolidado del período</div>
+    <!-- VISTA 3: Extremos -->
+    <div class="vista" id="vista-extremos">
+      <div class="section-label-panel">📊 Extremos del período</div>
+      <div class="section-subt-panel">Las 5 sucursales con mejor y peor desempeño en ventas netas</div>
+      <div class="topbot-grid">
+        <div class="tb-card">
+          <div class="tb-card-head">
+            <div class="tb-head-title top-5">▲ Top 5 sucursales</div>
+            <span class="badge up">Mejor desempeño</span>
+          </div>
+          <div id="top5List"></div>
         </div>
-        <div class="ttabs" id="rankingToggle">
-          <button class="ttab active" data-tipo="FAC">Productos</button>
-          <button class="ttab" data-tipo="GAR">Garantías</button>
-          <button class="ttab" data-tipo="POL">Seguros</button>
+        <div class="tb-card">
+          <div class="tb-card-head">
+            <div class="tb-head-title bot-5">▼ Bottom 5 sucursales</div>
+            <span class="badge dn">Atención gerencial</span>
+          </div>
+          <div id="bot5List"></div>
         </div>
       </div>
-    <div class="tbl-scroll-hint">← deslizá para ver más →</div>
-      <div class="tbl-wrap" style="max-height:380px">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th><th>SKU</th><th>Descripción</th>
-              <th class="r">Unidades</th><th class="r">Importe</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyArticulos"></tbody>
-        </table>
-      </div>
     </div>
 
-    <!-- Stock crítico -->
-    <div class="card" style="overflow:hidden">
-      <div class="stock-head">
-        <div>
-          <div class="stock-htitle">Stock crítico / quiebre</div>
-          <div class="stock-hsub">Snapshot actual · umbral 7 días de cobertura</div>
+    <!-- VISTA 4: Evolución -->
+    <div class="vista" id="vista-evolucion">
+      <div class="section-label-panel">📈 Evolución del período</div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Evolución temporal</div>
+            <div class="card-subt" id="evoSubt">Ventas netas</div>
+          </div>
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+            <div class="ttabs" id="evoToggle">
+              <button class="ttab active" data-serie="ventas">Ventas</button>
+              <button class="ttab" data-serie="garantias">Garantías</button>
+              <button class="ttab" data-serie="polizas">Seguros</button>
+            </div>
+          </div>
         </div>
-        <span class="stock-badge" id="stockBadge">cargando…</span>
+        <div class="card-body">
+          <div class="chart-wrap" style="height:340px"><canvas id="chartEvo"></canvas></div>
+        </div>
       </div>
-      <div class="stock-body">
-        <div class="stock-grid" id="stockList"></div>
+      <div class="card" id="cardDonut" style="margin-top:.75rem">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Participación por sucursal</div>
+            <div class="card-subt" id="donutSubtitle">Top 7</div>
+          </div>
+          <select class="mini-sel" id="donutMode">
+            <option value="ventas">Ventas</option>
+            <option value="garantias">Garantías</option>
+            <option value="polizas">Seguros</option>
+          </select>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap sm"><canvas id="chartDonut"></canvas></div>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="footer-note">CHEMES Dashboard Gerencial v10.0 (2026-04) · Diseño ejecutivo · Powered by Apps Script + GitHub Pages</div>
-</main>
+    <!-- VISTA 5: Ranking visual -->
+    <div class="vista" id="vista-ranking">
+      <div class="section-label-panel">🏅 Ranking de sucursales</div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Ranking con barras comparativas</div>
+            <div class="card-subt">Tendencia vs promedio del período</div>
+          </div>
+          <select class="mini-sel" id="rankMode">
+            <option value="ventas">Ventas</option>
+            <option value="garantias">Garantías</option>
+            <option value="polizas">Seguros</option>
+          </select>
+        </div>
+        <div class="rank-bar-list" id="rankBarList"></div>
+      </div>
+    </div>
+
+    <!-- VISTA 6: Tabla detallada -->
+    <div class="vista" id="vista-tabla">
+      <div class="section-label-panel">📋 Tabla comparativa detallada</div>
+      <div class="card" id="cardRankingSucursales">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Desempeño por sucursal</div>
+            <div class="card-subt">Ventas · ticket · comp. · GAR · POL · tendencia</div>
+          </div>
+        </div>
+        <div class="tbl-scroll-hint">← deslizá para ver más →</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Sucursal</th><th class="r">Ventas</th>
+                <th class="r col-ticket">Ticket</th><th class="r col-comp">Comp.</th>
+                <th class="r tgar">GAR %</th><th class="r tgar">GAR cant.</th>
+                <th class="r tpol">POL %</th><th class="r tpol">POL cant.</th>
+                <th class="r col-garimp">GAR $</th><th>Tendencia</th>
+              </tr>
+            </thead>
+            <tbody id="tbodySucursales"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 7: Top artículos -->
+    <div class="vista" id="vista-articulos">
+      <div class="section-label-panel">📦 Top artículos</div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title" id="titleRankingArt">Top artículos del período</div>
+            <div class="card-subt" id="rankingSubt">Ranking consolidado</div>
+          </div>
+          <div class="ttabs" id="rankingToggle">
+            <button class="ttab active" data-tipo="FAC">Productos</button>
+            <button class="ttab" data-tipo="GAR">Garantías</button>
+            <button class="ttab" data-tipo="POL">Seguros</button>
+          </div>
+        </div>
+        <div class="tbl-scroll-hint">← deslizá para ver más →</div>
+        <div class="tbl-wrap" style="max-height:520px">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>SKU</th><th>Descripción</th>
+                <th class="r">Unidades</th><th class="r">Importe</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyArticulos"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 8: Stock crítico -->
+    <div class="vista" id="vista-stock">
+      <div class="section-label-panel">⚠️ Stock crítico / quiebre</div>
+      <div class="card" style="overflow:hidden">
+        <div class="stock-head" style="border-radius:0">
+          <div>
+            <div class="stock-htitle">Artículos en situación crítica</div>
+            <div class="stock-hsub">Snapshot actual · umbral 7 días de cobertura</div>
+          </div>
+          <span class="stock-badge" id="stockBadge">cargando…</span>
+        </div>
+        <div class="stock-body">
+          <div class="stock-grid" id="stockList"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-view -->
+</div><!-- /panel-layout -->
+
+<!-- ── NAVBAR BOTTOM MOBILE ── -->
+<nav class="panel-nav-mobile">
+  <div class="panel-nav-mobile-inner">
+    <button class="nav-mob-item active" data-vista="insights">
+      <span class="nav-mob-icon">💡</span><span class="nav-mob-label">Resumen</span>
+    </button>
+    <button class="nav-mob-item" data-vista="semaforo">
+      <span class="nav-mob-icon">🚦</span><span class="nav-mob-label">Semáforo</span>
+    </button>
+    <button class="nav-mob-item" data-vista="extremos">
+      <span class="nav-mob-icon">📊</span><span class="nav-mob-label">Extremos</span>
+    </button>
+    <button class="nav-mob-item" data-vista="evolucion">
+      <span class="nav-mob-icon">📈</span><span class="nav-mob-label">Evolución</span>
+    </button>
+    <button class="nav-mob-item" data-vista="ranking">
+      <span class="nav-mob-icon">🏅</span><span class="nav-mob-label">Ranking</span>
+    </button>
+    <button class="nav-mob-item" data-vista="tabla">
+      <span class="nav-mob-icon">📋</span><span class="nav-mob-label">Tabla</span>
+    </button>
+    <button class="nav-mob-item" data-vista="articulos">
+      <span class="nav-mob-icon">📦</span><span class="nav-mob-label">Artículos</span>
+    </button>
+    <button class="nav-mob-item" data-vista="stock">
+      <span class="nav-mob-icon">⚠️</span><span class="nav-mob-label">Stock</span>
+    </button>
+  </div>
+</nav>
 
 <script>
 /* ══════════════════════════════════════════════════════
@@ -1235,7 +1500,8 @@ function updateStaticLabels(){
   const isSuc=!!state.sucursal;
   document.getElementById('cardDonut').classList.toggle('hidden',isSuc);
   document.getElementById('cardRankingSucursales').classList.toggle('hidden',isSuc);
-  document.getElementById('cardAdherencia').classList.toggle('hidden',isSuc);
+  const cardAdh = document.getElementById('cardAdherencia');
+  if(cardAdh) cardAdh.classList.toggle('hidden',isSuc);
   document.getElementById('semaforoGrid').parentElement && document.querySelector('.section-label:has(+.semaforo-grid)');
   updateGroupSel();
 }
@@ -1748,6 +2014,46 @@ async function refreshAll(){
 
 /* ── EVENTS ── */
 function bindEvents(){
+  // ── NAVEGACIÓN DE VISTAS (panel único) ──────────────────
+  function switchVista(id) {
+    // Ocultar todas las vistas
+    document.querySelectorAll('.vista').forEach(v => v.classList.remove('active'));
+    // Desactivar todos los nav items
+    document.querySelectorAll('.nav-item, .nav-mob-item').forEach(b => b.classList.remove('active'));
+    // Activar la vista
+    const vista = document.getElementById('vista-' + id);
+    if (vista) vista.classList.add('active');
+    // Activar nav items con ese data-vista
+    document.querySelectorAll(`[data-vista="${id}"]`).forEach(b => b.classList.add('active'));
+    // Scroll al top del panel-view
+    const pv = document.getElementById('panelView');
+    if (pv) pv.scrollTop = 0;
+    // Re-renderizar si la vista tiene gráficos (evita canvas colapsado)
+    if (id === 'evolucion') { renderEvolucion(); renderDonut(); }
+    if (id === 'ranking')   { renderRankBar(); }
+  }
+
+  // Bind nav items desktop y mobile
+  document.querySelectorAll('.nav-item, .nav-mob-item').forEach(btn => {
+    btn.addEventListener('click', () => switchVista(btn.dataset.vista));
+  });
+
+  // Calcular altura del header para el panel-layout
+  function setHdrOffset() {
+    const hdr     = document.querySelector('header');
+    const toolbar = document.querySelector('.toolbar-wrap');
+    const kpiStrip= document.getElementById('kpiStrip');
+    const statusW = document.querySelector('.status-bar-wrap');
+    let h = 0;
+    if (hdr)      h += hdr.offsetHeight;
+    if (toolbar)  h += toolbar.offsetHeight;
+    if (kpiStrip) h += kpiStrip.offsetHeight;
+    if (statusW)  h += statusW.offsetHeight;
+    document.documentElement.style.setProperty('--hdr-offset', h + 'px');
+  }
+  setHdrOffset();
+  window.addEventListener('resize', setHdrOffset);
+
   // Toggle filtros mobile
   const btnFT = document.getElementById('btnFilterToggle');
   const filterPanel = document.getElementById('filterPanel');
@@ -1755,6 +2061,8 @@ function bindEvents(){
     btnFT.addEventListener('click', () => {
       const open = filterPanel.classList.toggle('open');
       btnFT.textContent = open ? '⚙ Filtros ▴' : '⚙ Filtros ▾';
+      // Recalcular offset si el panel cambia de altura
+      setTimeout(setHdrOffset, 50);
     });
   }
 
