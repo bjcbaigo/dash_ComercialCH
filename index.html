@@ -1098,7 +1098,8 @@
    CONFIG + STATE  (idéntico al original v9.1)
 ══════════════════════════════════════════════════════ */
 const CONFIG={
-  API_BASE:window.CHEMES_API_BASE||'https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec',
+  // URL del Apps Script en producción (la misma que usa dash_sucursal)
+  API_BASE:window.CHEMES_API_BASE||'https://script.google.com/macros/s/AKfycbyjYTg8yYphbNjROMbP-fZeFTAYoK5uNX9tqSodKJR-y1iGI5nTe57WeoWKGQly5BrPDA/exec',
   DEFAULT_PERIOD:'month'
 };
 const COLORS=['#2596be','#17b3a8','#1d4ed8','#16a34a','#7c3aed','#d97706','#dc2626','#0f766e','#0891b2','#4f46e5'];
@@ -1564,17 +1565,19 @@ async function refreshHealth(){
     state.health=data;
     const archivos=data?.archivos||{};
     const algunExiste=Object.values(archivos).some(x=>x&&x.existe);
-    const todosFrescos=data?.todosFrescos===true;
-    const backendOk=algunExiste&&todosFrescos;
-    document.getElementById('lblBackend').textContent=backendOk?'Conectado':(algunExiste?'Datos viejos':'Sin archivos');
+    // El Apps Script real no tiene 'todosFrescos', se considera OK si existen archivos
+    const backendOk=algunExiste;
+    document.getElementById('lblBackend').textContent=backendOk?'Conectado':'Sin archivos';
     document.getElementById('healthPill').textContent=backendOk?'Operativo':'Revisar';
     document.getElementById('healthPill').className=`hpill ${backendOk?'ok':'warn'}`;
-    const chip=document.getElementById('chipFrescura');
-    if(!todosFrescos&&algunExiste){
-      chip.classList.remove('hidden');
-      const mh=Math.max(...Object.values(archivos).filter(x=>x&&x.existe).map(x=>x.horasAntiguedad||0));
-      document.getElementById('lblFrescura').textContent=`archivo más viejo: ${mh.toFixed(0)}h`;
-    }else{chip.classList.add('hidden');}
+    document.getElementById('chipFrescura').classList.add('hidden');
+    if(backendOk && data.archivos){
+      const maxFecha = Object.values(data.archivos)
+        .filter(x=>x&&x.existe&&x.modificado)
+        .map(x=>x.modificado).sort().pop();
+      if(maxFecha) document.getElementById('lblFechaDatos').textContent=
+        new Date(maxFecha).toLocaleDateString('es-AR');
+    }
   }catch(err){
     document.getElementById('lblBackend').textContent='Error';
     document.getElementById('healthPill').textContent='Error';
@@ -1583,24 +1586,146 @@ async function refreshHealth(){
   }
 }
 
+/* ══════════════════════════════════════════════════════
+   CAPA DE ADAPTACIÓN: api=ventas → estructura resumen
+   El Apps Script real expone:
+     api=ventas  → {data:[{fecha,tipo,nroComprobante,sucursal,vendedor,sku,descripcion,cantidad,total}]}
+     api=ranking → {data:[{sku,descripcion,unidades,importe}]}
+     api=stock   → {data:[{sucursal,sku,descripcion,stock_disponible,...}]}
+     api=gp      → {resumen:[{sucursal,garCant,garImporte,polCant,polImporte}]}
+   El frontend espera state.resumen con:
+     {kpis:{ventasNetas,garantias,polizas,ticketPromedio,...}, sucursales:[...], evolucion:[...]}
+══════════════════════════════════════════════════════ */
+function buildResumenDesdeVentas(ventasData, gpData){
+  const rows = safeArr(ventasData.data);
+
+  // ── Tipos de comprobante reales del CSV de Tango
+  const TIPO_FAC = r => r.tipo === 'FAC';
+  const TIPO_NC  = r => r.tipo === 'N/C' || r.tipo === 'NC';
+  const TIPO_GAR = r => r.tipo === 'GAR';
+  const TIPO_POL = r => r.tipo === 'POL';
+
+  // ── Totales globales
+  let ventasNetas=0, bruta=0, nc=0, unidades=0;
+  let garImp=0, polImp=0, garCant=0, polCant=0;
+  const comprobantes = new Set();
+
+  rows.forEach(r=>{
+    const t = r.total||0;
+    const u = Math.abs(r.cantidad||0);
+    if(TIPO_FAC(r)){ bruta+=t; unidades+=u; comprobantes.add(r.nroComprobante); }
+    if(TIPO_NC(r))  { nc+=t; }
+    if(TIPO_GAR(r)) { garImp+=t; garCant+=u||1; }
+    if(TIPO_POL(r)) { polImp+=t; polCant+=u||1; }
+  });
+  ventasNetas = bruta + nc; // nc viene negativo de Tango
+  const numComp = comprobantes.size;
+  const ticketPromedio = numComp>0 ? ventasNetas/numComp : 0;
+  const pctGar = ventasNetas>0 ? (garImp/ventasNetas*100) : 0;
+  const pctPol = ventasNetas>0 ? (polImp/ventasNetas*100) : 0;
+
+  // ── Por sucursal
+  const bySuc = {};
+  rows.forEach(r=>{
+    const suc = (r.sucursal||'').trim();
+    if(!suc) return;
+    if(!bySuc[suc]) bySuc[suc]={
+      sucursal:suc, ventas:0, unidades:0,
+      garantias:0, polizas:0,
+      cantidadGarantias:0, cantidadPolizas:0,
+      _comps:new Set(), _bruta:0, _nc:0
+    };
+    const s=bySuc[suc];
+    if(TIPO_FAC(r)){ s._bruta+=r.total; s.unidades+=Math.abs(r.cantidad||0); s._comps.add(r.nroComprobante); }
+    if(TIPO_NC(r))  { s._nc+=r.total; }
+    if(TIPO_GAR(r)) { s.garantias+=r.total; s.cantidadGarantias+=Math.abs(r.cantidad||0)||1; }
+    if(TIPO_POL(r)) { s.polizas+=r.total; s.cantidadPolizas+=Math.abs(r.cantidad||0)||1; }
+  });
+
+  const sucursales = Object.values(bySuc).map(s=>{
+    s.ventas = s._bruta + s._nc;
+    const nc = s._comps.size;
+    s.comprobantesVenta = nc;
+    s.ticketPromedio = nc>0 ? s.ventas/nc : 0;
+    s.pctGarantiasSobreVenta = s.ventas>0 ? (s.garantias/s.ventas*100) : 0;
+    s.pctPolizasSobreVenta   = s.ventas>0 ? (s.polizas/s.ventas*100)   : 0;
+    s.efectividadPolizas     = s.pctPolizasSobreVenta; // alias
+    delete s._comps; delete s._bruta; delete s._nc;
+    return s;
+  }).sort((a,b)=>b.ventas-a.ventas);
+
+  // ── Evolución diaria (para el gráfico)
+  const byFecha={};
+  rows.forEach(r=>{
+    if(!r.fecha) return;
+    if(!byFecha[r.fecha]) byFecha[r.fecha]={fecha:r.fecha,ventas:0,garantias:0,polizas:0};
+    const d=byFecha[r.fecha];
+    if(TIPO_FAC(r)||TIPO_NC(r)) d.ventas  +=r.total;
+    if(TIPO_GAR(r))              d.garantias+=r.total;
+    if(TIPO_POL(r))              d.polizas  +=r.total;
+  });
+  const evolucion = Object.values(byFecha).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+
+  // ── maxFecha
+  const fechas = rows.map(r=>r.fecha).filter(Boolean).sort();
+  const maxFecha = fechas[fechas.length-1]||null;
+
+  return {
+    kpis:{
+      ventasNetas, bruta, notasCredito:nc,
+      garantias:garImp, polizas:polImp,
+      cantidadGarantias:garCant, cantidadPolizas:polCant,
+      comprobantesVenta:numComp, comprobantes:numComp,
+      unidades, ticketPromedio,
+      pctGarantias:pctGar, pctPolizas:pctPol,
+      efectividadGarantias:pctGar, efectividadPolizas:pctPol,
+    },
+    sucursales,
+    evolucion,
+    topArticulos:[],
+    maxFecha,
+  };
+}
+
 /* ── REFRESH ── */
 async function refreshAll(){
   setError('');setLoading(true);updateStaticLabels();
   try{
-    await refreshHealth();
-    const results=await Promise.allSettled([
-      apiFetch('resumen'),
-      apiFetch('ranking',{useRange:false}),
-      apiFetch('stock',{useRange:false,soloQuiebre:1})
+    // Health — no bloquea si falla
+    try{ await refreshHealth(); }catch(e){ console.warn('health falló:', e.message); }
+
+    // Carga paralela: ventas (principal), ranking y stock
+    const range = PERIODS[state.period].getRange();
+    const [ventasRes, rankingRes, stockRes] = await Promise.allSettled([
+      apiFetch('ventas', { desde: range.desde, hasta: range.hasta }),
+      apiFetch('ranking', { useRange: false }),
+      apiFetch('stock',   { useRange: false, soloQuiebre: 1 })
     ]);
-    const[resumenRes,rankingRes,stockRes]=results;
-    if(resumenRes.status!=='fulfilled')throw(resumenRes.reason||new Error('Fallo api=resumen'));
-    state.resumen=resumenRes.value;
+
+    // ventas es obligatorio
+    if(ventasRes.status !== 'fulfilled'){
+      throw ventasRes.reason || new Error('Falló api=ventas');
+    }
+    const ventasData = ventasRes.value;
+
+    // Construir resumen desde ventas
+    state.resumen  = buildResumenDesdeVentas(ventasData, null);
+    state.ranking  = rankingRes.status === 'fulfilled' ? rankingRes.value : { data:[] };
+    state.stock    = stockRes.status  === 'fulfilled' ? stockRes.value  : { data:[], fecha_refresco:null };
+
+    if(rankingRes.status !== 'fulfilled') console.warn('api=ranking falló:', rankingRes.reason?.message);
+    if(stockRes.status  !== 'fulfilled') console.warn('api=stock falló:',   stockRes.reason?.message);
+
+    // Poblar selector de sucursales
     populateSucursalOptions(!state.sucursal);
-    state.ranking=rankingRes.status==='fulfilled'?rankingRes.value:{data:[]};
-    state.stock=stockRes.status==='fulfilled'?stockRes.value:{data:[],fecha_refresco:null};
-    if(rankingRes.status!=='fulfilled')console.warn('api=ranking fallo',rankingRes.reason);
-    if(stockRes.status!=='fulfilled')console.warn('api=stock fallo',stockRes.reason);
+
+    // Actualizar fecha datos
+    if(state.resumen.maxFecha){
+      document.getElementById('lblFechaDatos').textContent =
+        new Date(state.resumen.maxFecha+'T00:00:00').toLocaleDateString('es-AR');
+    }
+
+    // Render de todos los módulos
     renderKpis();
     renderInsights();
     renderSemaforo();
@@ -1612,9 +1737,13 @@ async function refreshAll(){
     renderTopArticulos();
     renderStock();
     renderRankBar();
+
   }catch(err){
-    console.error(err);setError(err.message||'Error general al cargar el dashboard');
-  }finally{setLoading(false);}
+    console.error('refreshAll error:', err);
+    setError(`Error al cargar datos: ${err.message||err}`);
+  }finally{
+    setLoading(false);
+  }
 }
 
 /* ── EVENTS ── */
