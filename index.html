@@ -1363,18 +1363,17 @@
    CONFIG + STATE  (idéntico al original v9.1)
 ══════════════════════════════════════════════════════ */
 const CONFIG={
-  // URL del Apps Script en producción (la misma que usa dash_sucursal)
-  API_BASE:window.CHEMES_API_BASE||'https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec,
+  // URL del Apps Script de producción — responde a api=resumen|ventas|ranking|stock|health
+  API_BASE:window.CHEMES_API_BASE||'https://script.google.com/macros/s/AKfycbwJ1TicuQa9ywi6anv_iCAAmTG2ujZQcqzUIAvQsplrq3-5wMCKnXNP6LrueiHS1WQKzw/exec',
   DEFAULT_PERIOD:'month'
 };
-  
 const COLORS=['#2596be','#17b3a8','#1d4ed8','#16a34a','#7c3aed','#d97706','#dc2626','#0f766e','#0891b2','#4f46e5'];
 const state={
   period:CONFIG.DEFAULT_PERIOD,group:'daily',seriEvo:'ventas',rankTipo:'FAC',
   search:'',sucursal:'',token:'',rankMode:'ventas',
   resumen:null,ranking:null,stock:null,health:null,
-  rawVentas:null,   // datos completos de api=ventas sin filtrar
-  rawStock:null,    // datos completos de api=stock sin filtrar
+  rawResumen:null,  // resumen completo sin filtrar (todas las sucursales)
+  rawStock:null,    // stock completo sin filtrar
   allSucursales:[],customDesde:'',customHasta:'',loading:false,charts:{}
 };
 const qs=new URLSearchParams(location.search);
@@ -1960,37 +1959,68 @@ function buildResumenDesdeVentas(ventasData, filtroSucursal){
 }
 
 /* ── APLICAR FILTRO DE SUCURSAL SIN RE-FETCH ──────────────
-   Cuando el usuario cambia la sucursal en el dropdown,
-   re-procesamos los datos ya cargados en cliente.
-   NO se hace ningún request al servidor.
+   api=resumen ya devuelve {kpis, sucursales, evolucion, topArticulos}.
+   Cuando el usuario elige una sucursal en el dropdown, filtramos
+   state.rawResumen.sucursales en cliente — sin llamar al servidor.
+   El servidor rechazaría con "Token requerido" si recibiera sucursal= sin token.
 ─────────────────────────────────────────────────────────── */
 function applySucursalFilter(){
-  if(!state.rawVentas) return; // no hay datos aún
+  if(!state.rawResumen) return;
 
-  // Re-construir resumen filtrando en cliente
-  state.resumen = buildResumenDesdeVentas(state.rawVentas, state.sucursal);
+  const sucFiltro = (state.sucursal||'').trim().toUpperCase();
 
-  // Filtrar stock en cliente también
-  if(state.rawStock){
-    const sucFiltro = (state.sucursal||'').trim().toUpperCase();
-    if(sucFiltro){
-      const filteredData = safeArr(state.rawStock.data)
-        .filter(r=>(r.sucursal||'').toUpperCase().trim()===sucFiltro);
-      state.stock = { ...state.rawStock, data: filteredData };
-    } else {
-      state.stock = state.rawStock;
-    }
+  if(!sucFiltro){
+    // Sin filtro — usar resumen completo tal como vino
+    state.resumen = state.rawResumen;
+    state.stock   = state.rawStock;
+  } else {
+    // Filtrar sucursales en cliente
+    const sucsFiltradas = safeArr(state.rawResumen.sucursales)
+      .filter(r => (r.sucursal||'').toUpperCase().trim() === sucFiltro);
+
+    // Recalcular KPIs desde la sucursal filtrada
+    const suc = sucsFiltradas[0] || {};
+    const ventas   = Number(suc.ventas||0);
+    const garantias= Number(suc.garantias||0);
+    const polizas  = Number(suc.polizas||0);
+
+    state.resumen = {
+      ...state.rawResumen,
+      sucursales: sucsFiltradas,
+      kpis: {
+        ...state.rawResumen.kpis,
+        ventasNetas:      ventas,
+        garantias:        garantias,
+        polizas:          polizas,
+        comprobantesVenta:Number(suc.comprobantesVenta||suc.comprobantes||0),
+        comprobantes:     Number(suc.comprobantesVenta||suc.comprobantes||0),
+        unidades:         Number(suc.unidades||0),
+        ticketPromedio:   Number(suc.ticketPromedio||0),
+        pctGarantias:     Number(suc.pctGarantiasSobreVenta||0),
+        pctPolizas:       Number(suc.pctPolizasSobreVenta||0),
+        cantidadGarantias:Number(suc.cantidadGarantias||0),
+        cantidadPolizas:  Number(suc.cantidadPolizas||0),
+      },
+      // Evolución filtrada si el AS la manda por sucursal, sino la global
+      evolucion: safeArr(state.rawResumen.evolucion)
+    };
+
+    // Stock filtrado en cliente
+    const stockData = safeArr(state.rawStock?.data)
+      .filter(r => (r.sucursal||'').toUpperCase().trim() === sucFiltro);
+    state.stock = { ...state.rawStock, data: stockData };
   }
 
   updateStaticLabels();
 
   // Actualizar fecha
-  if(state.resumen.maxFecha){
+  const fec = state.resumen?.maxFecha || state.rawResumen?.maxFecha;
+  if(fec){
     document.getElementById('lblFechaDatos').textContent =
-      new Date(state.resumen.maxFecha+'T00:00:00').toLocaleDateString('es-AR');
+      new Date(fec+'T00:00:00').toLocaleDateString('es-AR');
   }
 
-  // Re-renderizar todo
+  // Re-renderizar
   renderKpis();
   renderInsights();
   renderSemaforo();
@@ -2011,29 +2041,31 @@ async function refreshAll(){
     try{ await refreshHealth(); }catch(e){ console.warn('health falló:', e.message); }
 
     const range = PERIODS[state.period].getRange();
-    // FIX: SIN sucursal= en ningún request — siempre datos completos, filtro en cliente
-    const [ventasRes, rankingRes, stockRes] = await Promise.allSettled([
-      apiFetch('ventas', { desde: range.desde, hasta: range.hasta }),
+
+    // api=resumen es el endpoint principal — ya devuelve {kpis, sucursales, evolucion, topArticulos}
+    // api=ranking y api=stock se cargan en paralelo
+    const [resumenRes, rankingRes, stockRes] = await Promise.allSettled([
+      apiFetch('resumen'),
       apiFetch('ranking', { useRange: false }),
       apiFetch('stock',   { useRange: false, soloQuiebre: 1 })
     ]);
 
-    if(ventasRes.status !== 'fulfilled'){
-      throw ventasRes.reason || new Error('Falló api=ventas');
+    if(resumenRes.status !== 'fulfilled'){
+      throw resumenRes.reason || new Error('Falló api=resumen');
     }
 
-    // Guardar datos crudos completos
-    state.rawVentas = ventasRes.value;
-    state.rawStock  = stockRes.status === 'fulfilled' ? stockRes.value : { data:[], fecha_refresco:null };
-    state.ranking   = rankingRes.status === 'fulfilled' ? rankingRes.value : { data:[] };
+    // Guardar resumen completo (todas las sucursales) para filtro cliente
+    state.rawResumen = resumenRes.value;
+    state.rawStock   = stockRes.status === 'fulfilled' ? stockRes.value : { data:[], fecha_refresco:null };
+    state.ranking    = rankingRes.status === 'fulfilled' ? rankingRes.value : { data:[] };
 
     if(rankingRes.status !== 'fulfilled') console.warn('api=ranking falló:', rankingRes.reason?.message);
     if(stockRes.status  !== 'fulfilled') console.warn('api=stock falló:',   stockRes.reason?.message);
 
-    // Poblar selector con TODAS las sucursales (antes de filtrar)
-    const todasSucursales = safeArr(state.rawVentas.data)
+    // Poblar selector con TODAS las sucursales del resumen
+    const todasSucs = safeArr(state.rawResumen.sucursales)
       .map(r=>(r.sucursal||'').trim()).filter(Boolean);
-    state.allSucursales = Array.from(new Set(todasSucursales)).sort((a,b)=>a.localeCompare(b,'es'));
+    state.allSucursales = Array.from(new Set(todasSucs)).sort((a,b)=>a.localeCompare(b,'es'));
     populateSucursalOptions(true);
 
     // Aplicar filtro de sucursal (puede ser '' para todas)
@@ -2122,9 +2154,7 @@ function bindEvents(){
   }));
   document.getElementById('sucursalSel').addEventListener('change',e=>{
     state.sucursal=e.target.value.trim();
-    // FIX: filtrar en cliente sin re-fetchear al servidor
-    // El servidor lanza "Token requerido o inválido" si recibe sucursal= sin token
-    if(state.rawVentas){
+    if(state.rawResumen){
       applySucursalFilter();
     } else {
       refreshAll();
