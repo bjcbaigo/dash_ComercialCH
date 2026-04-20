@@ -232,6 +232,7 @@
       .tbl-scroll-hint { display: block; }
     }
     .tb-sep { width: 1px; background: var(--border); align-self: stretch; margin: 0 .25rem; }
+    .tb-select {
       padding: .38rem .7rem; border-radius: var(--r-md);
       background: var(--surf2); border: 1px solid var(--border);
       color: var(--text2); font-family: var(--sans); font-size: .72rem;
@@ -1877,83 +1878,147 @@ function buildResumenDesdeVentas(ventasData, filtroSucursal){
   const TIPO_GAR = r => r.tipo === 'GAR';
   const TIPO_POL = r => r.tipo === 'POL';
 
+  // Cuenta 1 vez por comprobante y tipo. Esto alinea GAR/POL con el criterio operativo
+  // de la sucursal y evita inflar cantidades cuando un mismo comprobante trae varias líneas.
+  const docKey = (r, tipoForzado='') => {
+    const nro = String(r.nroComprobante || r.nro || '').trim();
+    const suc = String(r.sucursal || '').trim();
+    const fec = String(r.fecha || '').trim();
+    const tipo = String(tipoForzado || r.tipo || '').trim().toUpperCase();
+    return [tipo, suc, fec, nro].join('|');
+  };
+
   // ── Totales globales
-  let ventasNetas=0, bruta=0, nc=0, unidades=0;
-  let garImp=0, polImp=0, garCant=0, polCant=0;
-  const comprobantes = new Set();
+  let ventasNetas = 0, bruta = 0, nc = 0, unidades = 0;
+  let garImp = 0, polImp = 0;
+  const comprobantesVenta = new Set();
+  const garDocs = new Set();
+  const polDocs = new Set();
 
-  rows.forEach(r=>{
-    const t = r.total||0;
-    const u = Math.abs(r.cantidad||0);
-    if(TIPO_FAC(r)){ bruta+=t; unidades+=u; comprobantes.add(r.nroComprobante); }
-    if(TIPO_NC(r))  { nc+=t; }
-    if(TIPO_GAR(r)) { garImp+=t; garCant+=u||1; }
-    if(TIPO_POL(r)) { polImp+=t; polCant+=u||1; }
+  rows.forEach(r => {
+    const t = Number(r.total || 0);
+    const u = Math.abs(Number(r.cantidad || 0));
+
+    if (TIPO_FAC(r)) {
+      bruta += t;
+      unidades += u;
+      if (r.nroComprobante) comprobantesVenta.add(docKey(r, 'FAC'));
+    }
+    if (TIPO_NC(r)) {
+      nc += t;
+    }
+    if (TIPO_GAR(r)) {
+      garImp += t;
+      if (r.nroComprobante) garDocs.add(docKey(r, 'GAR'));
+    }
+    if (TIPO_POL(r)) {
+      polImp += t;
+      if (r.nroComprobante) polDocs.add(docKey(r, 'POL'));
+    }
   });
+
   ventasNetas = bruta + nc;
-  const numComp = comprobantes.size;
-  const ticketPromedio = numComp>0 ? ventasNetas/numComp : 0;
-  const pctGar = ventasNetas>0 ? (garImp/ventasNetas*100) : 0;
-  const pctPol = ventasNetas>0 ? (polImp/ventasNetas*100) : 0;
+  const numComp = comprobantesVenta.size;
+  const ticketPromedio = numComp > 0 ? ventasNetas / numComp : 0;
+  const pctGar = ventasNetas > 0 ? (garImp / ventasNetas * 100) : 0;
+  const pctPol = ventasNetas > 0 ? (polImp / ventasNetas * 100) : 0;
 
-  // ── Por sucursal (solo si NO hay filtro — en modo empresa)
+  // ── Por sucursal
   const bySuc = {};
-  rows.forEach(r=>{
-    const suc = (r.sucursal||'').trim();
-    if(!suc) return;
-    if(!bySuc[suc]) bySuc[suc]={
-      sucursal:suc, ventas:0, unidades:0,
-      garantias:0, polizas:0,
-      cantidadGarantias:0, cantidadPolizas:0,
-      _comps:new Set(), _bruta:0, _nc:0
-    };
-    const s=bySuc[suc];
-    if(TIPO_FAC(r)){ s._bruta+=r.total; s.unidades+=Math.abs(r.cantidad||0); s._comps.add(r.nroComprobante); }
-    if(TIPO_NC(r))  { s._nc+=r.total; }
-    if(TIPO_GAR(r)) { s.garantias+=r.total; s.cantidadGarantias+=Math.abs(r.cantidad||0)||1; }
-    if(TIPO_POL(r)) { s.polizas+=r.total; s.cantidadPolizas+=Math.abs(r.cantidad||0)||1; }
+  rows.forEach(r => {
+    const suc = String(r.sucursal || '').trim();
+    if (!suc) return;
+
+    if (!bySuc[suc]) {
+      bySuc[suc] = {
+        sucursal: suc,
+        ventas: 0,
+        unidades: 0,
+        garantias: 0,
+        polizas: 0,
+        cantidadGarantias: 0,
+        cantidadPolizas: 0,
+        _ventaDocs: new Set(),
+        _garDocs: new Set(),
+        _polDocs: new Set(),
+        _bruta: 0,
+        _nc: 0
+      };
+    }
+
+    const s = bySuc[suc];
+    if (TIPO_FAC(r)) {
+      s._bruta += Number(r.total || 0);
+      s.unidades += Math.abs(Number(r.cantidad || 0));
+      if (r.nroComprobante) s._ventaDocs.add(docKey(r, 'FAC'));
+    }
+    if (TIPO_NC(r)) {
+      s._nc += Number(r.total || 0);
+    }
+    if (TIPO_GAR(r)) {
+      s.garantias += Number(r.total || 0);
+      if (r.nroComprobante) s._garDocs.add(docKey(r, 'GAR'));
+    }
+    if (TIPO_POL(r)) {
+      s.polizas += Number(r.total || 0);
+      if (r.nroComprobante) s._polDocs.add(docKey(r, 'POL'));
+    }
   });
 
-  const sucursales = Object.values(bySuc).map(s=>{
+  const sucursales = Object.values(bySuc).map(s => {
     s.ventas = s._bruta + s._nc;
-    const nc = s._comps.size;
-    s.comprobantesVenta = nc;
-    s.ticketPromedio = nc>0 ? s.ventas/nc : 0;
-    s.pctGarantiasSobreVenta = s.ventas>0 ? (s.garantias/s.ventas*100) : 0;
-    s.pctPolizasSobreVenta   = s.ventas>0 ? (s.polizas/s.ventas*100)   : 0;
-    s.efectividadPolizas     = s.pctPolizasSobreVenta;
-    delete s._comps; delete s._bruta; delete s._nc;
+    s.comprobantesVenta = s._ventaDocs.size;
+    s.comprobantes = s.comprobantesVenta;
+    s.ticketPromedio = s.comprobantesVenta > 0 ? s.ventas / s.comprobantesVenta : 0;
+    s.cantidadGarantias = s._garDocs.size;
+    s.cantidadPolizas = s._polDocs.size;
+    s.pctGarantiasSobreVenta = s.ventas > 0 ? (s.garantias / s.ventas * 100) : 0;
+    s.pctPolizasSobreVenta = s.ventas > 0 ? (s.polizas / s.ventas * 100) : 0;
+    s.efectividadPolizas = s.pctPolizasSobreVenta;
+    delete s._ventaDocs;
+    delete s._garDocs;
+    delete s._polDocs;
+    delete s._bruta;
+    delete s._nc;
     return s;
-  }).sort((a,b)=>b.ventas-a.ventas);
+  }).sort((a, b) => b.ventas - a.ventas);
 
   // ── Evolución diaria
-  const byFecha={};
-  rows.forEach(r=>{
-    if(!r.fecha) return;
-    if(!byFecha[r.fecha]) byFecha[r.fecha]={fecha:r.fecha,ventas:0,garantias:0,polizas:0};
-    const d=byFecha[r.fecha];
-    if(TIPO_FAC(r)||TIPO_NC(r)) d.ventas  +=r.total;
-    if(TIPO_GAR(r))              d.garantias+=r.total;
-    if(TIPO_POL(r))              d.polizas  +=r.total;
+  const byFecha = {};
+  rows.forEach(r => {
+    if (!r.fecha) return;
+    if (!byFecha[r.fecha]) byFecha[r.fecha] = { fecha: r.fecha, ventas: 0, garantias: 0, polizas: 0 };
+    const d = byFecha[r.fecha];
+    if (TIPO_FAC(r) || TIPO_NC(r)) d.ventas += Number(r.total || 0);
+    if (TIPO_GAR(r)) d.garantias += Number(r.total || 0);
+    if (TIPO_POL(r)) d.polizas += Number(r.total || 0);
   });
-  const evolucion = Object.values(byFecha).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const evolucion = Object.values(byFecha).sort((a, b) => a.fecha.localeCompare(b.fecha));
 
-  const fechas = rows.map(r=>r.fecha).filter(Boolean).sort();
-  const maxFecha = fechas[fechas.length-1]||null;
+  const fechas = rows.map(r => r.fecha).filter(Boolean).sort();
+  const maxFecha = fechas[fechas.length - 1] || null;
 
   return {
-    kpis:{
-      ventasNetas, bruta, notasCredito:nc,
-      garantias:garImp, polizas:polImp,
-      cantidadGarantias:garCant, cantidadPolizas:polCant,
-      comprobantesVenta:numComp, comprobantes:numComp,
-      unidades, ticketPromedio,
-      pctGarantias:pctGar, pctPolizas:pctPol,
-      efectividadGarantias:pctGar, efectividadPolizas:pctPol,
+    kpis: {
+      ventasNetas,
+      bruta,
+      notasCredito: nc,
+      garantias: garImp,
+      polizas: polImp,
+      cantidadGarantias: garDocs.size,
+      cantidadPolizas: polDocs.size,
+      comprobantesVenta: numComp,
+      comprobantes: numComp,
+      unidades,
+      ticketPromedio,
+      pctGarantias: pctGar,
+      pctPolizas: pctPol,
+      efectividadGarantias: pctGar,
+      efectividadPolizas: pctPol,
     },
     sucursales,
     evolucion,
-    topArticulos:[],
+    topArticulos: [],
     maxFecha,
   };
 }
