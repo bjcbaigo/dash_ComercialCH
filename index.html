@@ -1397,44 +1397,46 @@ const PERIODS={
   }}
 };
 function getPreviousRange(period){
-  const t=todayLocal();
+  const current = PERIODS[period]?.getRange?.();
+  if(!current?.desde || !current?.hasta) return null;
+
+  const curDesde = new Date(current.desde+'T00:00:00');
+  const curHasta = new Date(current.hasta+'T00:00:00');
+  const span = Math.max(1, Math.round((curHasta-curDesde)/86400000)+1);
+
   switch(period){
     case 'today':{
-      const y=addDays(t,-1);
+      const y=addDays(curDesde,-1);
       return {desde:isoDate(y),hasta:isoDate(y)};
     }
     case 'week':{
-      const day=(t.getDay()+6)%7;
-      const curStart=addDays(t,-day);
-      const prevEnd=addDays(curStart,-1);
-      const prevStart=addDays(prevEnd,-6);
-      return {desde:isoDate(prevStart),hasta:isoDate(prevEnd)};
+      // Mismo tramo de la semana anterior
+      const prevWeekStart = addDays(curDesde,-7);
+      const prevWeekEnd = addDays(prevWeekStart, span-1);
+      return {desde:isoDate(prevWeekStart),hasta:isoDate(prevWeekEnd)};
     }
     case 'month':{
-      return {desde:isoDate(new Date(t.getFullYear(),t.getMonth()-1,1)),hasta:isoDate(new Date(t.getFullYear(),t.getMonth(),0))};
+      // Mismo tramo del mes anterior: 01-18 abr vs 01-18 mar
+      const prevMonthStart = new Date(curDesde.getFullYear(), curDesde.getMonth()-1, 1);
+      const prevMonthLastDay = new Date(curDesde.getFullYear(), curDesde.getMonth(), 0).getDate();
+      const prevMonthEnd = new Date(
+        prevMonthStart.getFullYear(),
+        prevMonthStart.getMonth(),
+        Math.min(curHasta.getDate(), prevMonthLastDay)
+      );
+      return {desde:isoDate(prevMonthStart),hasta:isoDate(prevMonthEnd)};
     }
     case 'lastmonth':{
-      return {desde:isoDate(new Date(t.getFullYear(),t.getMonth()-2,1)),hasta:isoDate(new Date(t.getFullYear(),t.getMonth()-1,0))};
+      // Mes anterior completo vs el mes completo inmediatamente anterior
+      const prevStart = new Date(curDesde.getFullYear(), curDesde.getMonth()-1, 1);
+      const prevEnd = new Date(curDesde.getFullYear(), curDesde.getMonth(), 0);
+      return {desde:isoDate(prevStart),hasta:isoDate(prevEnd)};
     }
-    case '3months':{
-      return {desde:isoDate(new Date(t.getFullYear(),t.getMonth()-5,1)),hasta:isoDate(new Date(t.getFullYear(),t.getMonth()-2,0))};
-    }
-    case '6months':{
-      return {desde:isoDate(new Date(t.getFullYear(),t.getMonth()-11,1)),hasta:isoDate(new Date(t.getFullYear(),t.getMonth()-5,0))};
-    }
+    case '3months':
+    case '6months':
     case 'custom':{
-      if(isValidIsoDate(state.customDesde)&&isValidIsoDate(state.customHasta)){
-        const d1=new Date(state.customDesde+'T00:00:00');
-        const d2=new Date(state.customHasta+'T00:00:00');
-        const span=Math.max(1,Math.round((d2-d1)/86400000)+1);
-        const prevEnd=addDays(d1,-1);
-        const prevStart=addDays(prevEnd,-(span-1));
-        return {desde:isoDate(prevStart),hasta:isoDate(prevEnd)};
-      }
-      const s=new Date(t.getFullYear(),t.getMonth(),1);
-      const e=t;
-      const span=Math.max(1,Math.round((e-s)/86400000)+1);
-      const prevEnd=addDays(s,-1);
+      // Bloque anterior exacto de igual longitud
+      const prevEnd=addDays(curDesde,-1);
       const prevStart=addDays(prevEnd,-(span-1));
       return {desde:isoDate(prevStart),hasta:isoDate(prevEnd)};
     }
@@ -2262,4 +2264,3 @@ init();
 </script>
 </body>
 </html>
-
