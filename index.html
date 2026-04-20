@@ -426,7 +426,10 @@
 
     /* ── RANKING BAR ─────────────────────────────────────── */
     .rank-bar-list { display: flex; flex-direction: column; gap: .35rem; padding: .75rem .9rem; }
-    .rank-bar-item { display: grid; grid-template-columns: 1.4rem 120px 1fr 90px; align-items: center; gap: .55rem; }
+    .rank-bar-item { display: grid; grid-template-columns: 1.4rem 120px 1fr 118px; align-items: center; gap: .55rem; }
+    .rank-metrics { display:flex; flex-direction:column; align-items:flex-end; gap:.08rem; min-width:62px; }
+    .rank-note { font-size:.55rem; color: var(--muted2); line-height:1; white-space:nowrap; }
+    .rank-tend-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:.14rem; }
     .rank-pos {
       width: 20px; height: 20px; border-radius: 6px;
       background: var(--surf3); border: 1px solid var(--border);
@@ -669,7 +672,8 @@
 
       /* ranking barras: simplificado, sin columna tendencia */
       .rank-bar-list  { padding: .5rem .65rem; gap: .3rem; }
-      .rank-bar-item  { grid-template-columns: 1.3rem 1fr 55px; gap: .4rem; }
+      .rank-bar-item  { grid-template-columns: 1.3rem 1fr 82px; gap: .4rem; }
+      .rank-note      { font-size:.5rem; }
       .rank-tend      { display: none; }        /* ocultar en xs */
       .rank-name      { font-size: .67rem; }
       .rank-pct       { font-size: .6rem; min-width: 26px; }
@@ -723,7 +727,7 @@
       .topbot-grid    { grid-template-columns: 1fr; }
       .grid-2, .grid-3, .grid-evo { grid-template-columns: 1fr; }
 
-      .rank-bar-item  { grid-template-columns: 1.4rem 110px 1fr 65px; }
+      .rank-bar-item  { grid-template-columns: 1.4rem 110px 1fr 92px; }
       .rank-tend      { display: none; }
 
       .stock-grid     { grid-template-columns: 1fr; }
@@ -744,7 +748,7 @@
       .grid-3         { grid-template-columns: 1fr; }
       .grid-evo       { grid-template-columns: 1fr; }
 
-      .rank-bar-item  { grid-template-columns: 1.4rem 130px 1fr 80px; }
+      .rank-bar-item  { grid-template-columns: 1.4rem 130px 1fr 104px; }
       .stock-grid     { grid-template-columns: 1fr 1fr; }
     }
 
@@ -1239,7 +1243,7 @@
         <div class="card-head">
           <div>
             <div class="card-title">Ranking con barras comparativas</div>
-            <div class="card-subt">Tendencia vs promedio del período</div>
+            <div class="card-subt">Participación vs líder · variación vs período anterior equivalente</div>
           </div>
           <select class="mini-sel" id="rankMode">
             <option value="ventas">Ventas</option>
@@ -1258,7 +1262,7 @@
         <div class="card-head">
           <div>
             <div class="card-title">Desempeño por sucursal</div>
-            <div class="card-subt">Ventas · ticket · comp. · GAR · POL · tendencia</div>
+            <div class="card-subt">Ventas · ticket · comp. · GAR · POL · variación vs período anterior</div>
           </div>
         </div>
         <div class="tbl-scroll-hint">← deslizá para ver más →</div>
@@ -1680,16 +1684,20 @@ function renderRankBar(){
 
   const subt=document.querySelector('#vista-ranking .card-subt');
   if(subt){
-    subt.textContent = state.period==='month'
-      ? 'Comparativa vs mes anterior'
-      : 'Comparativa vs período anterior';
+    subt.textContent = 'Participación vs líder · variación vs período anterior equivalente';
   }
+
+  const prevLabel = state.period==='month'
+    ? 'vs mes anterior'
+    : state.period==='lastmonth'
+      ? 'vs mes previo'
+      : 'vs período anterior';
 
   list.innerHTML=rows.map((r,i)=>{
     const v=Number(r[mode]||0);
     const pct=Math.round((v/max)*100);
     const prev=Number(r[prevField]||0);
-    let tendHtml='<span class="tend eq">s/dato prev.</span>';
+    let tendHtml='<span class="tend eq">s/dato</span>';
     if(prev>0){
       const diff=((v-prev)/prev)*100;
       tendHtml=diff>0
@@ -1708,9 +1716,15 @@ function renderRankBar(){
       <div class="rank-name" title="${esc(r.sucursal)}">${esc(r.sucursal)}</div>
       <div class="rank-bar-wrap">
         <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-        <span class="rank-pct">${pct}%</span>
+        <div class="rank-metrics">
+          <span class="rank-pct">${pct}%</span>
+          <span class="rank-note">participación</span>
+        </div>
       </div>
-      <div class="rank-tend">${tendHtml}</div>
+      <div class="rank-tend-wrap">
+        <div class="rank-tend">${tendHtml}</div>
+        <span class="rank-note">${prevLabel}</span>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1775,14 +1789,19 @@ function renderSucursales(){
   const rows=safeArr(state.resumen?.sucursales);
   const tbody=document.getElementById('tbodySucursales');
   if(!rows.length){tbody.innerHTML='<tr><td colspan="11"><div class="empty">Sin datos de sucursales para el período.</div></td></tr>';return;}
-  const avgVentas=rows.reduce((s,r)=>s+Number(r.ventas||0),0)/rows.length;
   tbody.innerHTML=rows.map((r,i)=>{
     const v=Number(r.ventas||0);
     const garPct=Number(r.pctGarantiasSobreVenta??(v>0?(Number(r.garantias||0)/v*100):0));
     const polPct=Number(r.pctPolizasSobreVenta??(v>0?(Number(r.polizas||0)/v*100):0));
-    const diff=avgVentas>0?((v-avgVentas)/avgVentas*100):0;
+    const prev=Number(r.ventasAnterior||0);
     const cls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const tendHtml=diff>5?`<span class="tend up">▲ +${diff.toFixed(1)}%</span>`:diff<-5?`<span class="tend dn">▼ ${diff.toFixed(1)}%</span>`:`<span class="tend eq">≈ prom</span>`;
+    let tendHtml='<span class="tend eq">s/dato</span>';
+    if(prev>0){
+      const diff=((v-prev)/prev)*100;
+      tendHtml=diff>0?`<span class="tend up">▲ +${diff.toFixed(1)}%</span>`:diff<0?`<span class="tend dn">▼ ${diff.toFixed(1)}%</span>`:`<span class="tend eq">0.0%</span>`;
+    }else if(v>0){
+      tendHtml='<span class="tend up">nuevo</span>';
+    }
     return`<tr>
       <td><span class="tbl-rank ${cls}">${i+1}</span></td>
       <td style="font-weight:600">${esc(r.sucursal)}</td>
