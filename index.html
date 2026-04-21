@@ -1998,14 +1998,40 @@ function renderObjetivos(){
     return;
   }
 
-  const mode  = document.getElementById('objMode').value;
-  const total = Number(state.resumen?.kpis?.[mode]||0)||0;
-  const rows  = safeArr(state.resumen?.sucursales)
-    .map(r=>({sucursal:r.sucursal,valor:Number(r[mode]||0),pct:total?(Number(r[mode]||0)/total)*100:0}))
-    .filter(r=>r.valor>0)
+  const mode = document.getElementById('objMode').value;
+  const totalMap = {
+    ventas: Number(state.resumen?.kpis?.ventasNetas || 0),
+    garantias: Number(state.resumen?.kpis?.garantias || 0),
+    polizas: Number(state.resumen?.kpis?.polizas || 0)
+  };
+  const fieldMap = {
+    ventas: 'ventas',
+    garantias: 'garantias',
+    polizas: 'polizas'
+  };
+  const modeLabel = mode==='ventas' ? 'Ventas'
+                  : mode==='garantias' ? 'Garantías'
+                  : mode==='polizas' ? 'Seguros' : mode;
+  const valueField = fieldMap[mode] || mode;
+  let total = totalMap[mode];
+
+  const baseRows = safeArr(state.resumen?.sucursales)
+    .map(r => ({
+      sucursal: r.sucursal,
+      valor: Number(r[valueField] || 0)
+    }))
+    .filter(r => r.valor > 0);
+
+  // Fallback defensivo: si por algún motivo el KPI total no viene, usar suma de sucursales.
+  if(!(total > 0)){
+    total = baseRows.reduce((acc, r) => acc + r.valor, 0);
+  }
+
+  const rows = baseRows
+    .map(r => ({...r, pct: total ? (r.valor / total) * 100 : 0}))
     .sort((a,b)=>b.pct-a.pct);
 
-  if(!rows.length){
+  if(!rows.length || !(total > 0)){
     if(wrapEl) wrapEl.classList.add('hidden');
     if(emptyEl) emptyEl.classList.remove('hidden');
     return;
@@ -2025,10 +2051,6 @@ function renderObjetivos(){
   const labels = rows.map(r=>r.sucursal);
   const values = rows.map(r=>+r.pct.toFixed(2));
   const colors = rows.map(r=>COL[levelOf(r.pct)]);
-
-  const modeLabel = mode==='ventas' ? 'Ventas'
-                  : mode==='garantias' ? 'Garantías'
-                  : mode==='polizas' ? 'Seguros' : mode;
 
   state.charts.adh = new Chart(canvas, {
     type: 'bar',
