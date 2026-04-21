@@ -108,7 +108,26 @@
     .logo-text .logo-sub { font-size: .56rem; color: rgba(255,255,255,.72); letter-spacing: .14em; font-weight: 500; margin-top: 3px; text-transform: uppercase; }
     .logo-text .logo-period { font-size: .62rem; color: #d6ecf3; font-weight: 500; }
 
-    .hdr-pills { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+    .hdr-pills { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; justify-content: flex-end; }
+
+    /* ── Chips de contexto (Período/Sucursal/Datos al/Backend) en el header ── */
+    .hdr-chips {
+      display: flex; align-items: center; gap: .35rem; flex-wrap: wrap;
+    }
+    .hchip {
+      padding: .28rem .65rem; border-radius: 999px;
+      font-size: .62rem; font-weight: 500; letter-spacing: .01em;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.88);
+      white-space: nowrap;
+    }
+    .hchip b { color: #fff; font-weight: 700; }
+    .hchip.warn { background: rgba(255,215,215,.22); border-color: rgba(255,215,215,.35); color: #fee2e2; }
+    .hchip.warn b { color: #fff; }
+
+    .hdr-pills-right { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+
     .hpill {
       padding: .28rem .7rem; border-radius: 999px;
       font-size: .63rem; font-weight: 600; letter-spacing: .02em;
@@ -646,6 +665,7 @@
       .logo-text .logo-sub { display: none; }
       .logo-text .logo-period { display: none; }
       .hpill          { display: none; }         /* ocultar pills — solo botón refresh */
+      .hdr-chips      { display: none; }         /* ocultar chips en xs (header ya suficientemente cargado) */
       .hdr-btn        { padding: .35rem .75rem; font-size: .68rem; }
 
       /* toolbar: apilado vertical, touch-friendly */
@@ -759,6 +779,7 @@
     @media (min-width: 481px) and (max-width: 640px) {
       .hdr-inner      { padding: .6rem 1rem; }
       .hpill:not(#modePill):not(#healthPill) { display: none; }
+      .hdr-chips      { display: none; }
       .logo-text .logo-sub  { display: none; }
       .logo-text .logo-period { display: none; }
 
@@ -785,6 +806,9 @@
     /* ── 900px — tablet vertical ── */
     @media (min-width: 641px) and (max-width: 900px) {
       .hdr-inner      { padding: .65rem 1.2rem; }
+      /* chips compactos: solo Período + Sucursal */
+      .hdr-chips .hchip:nth-child(n+3) { display: none; }
+      .hchip          { font-size: .58rem; padding: .22rem .55rem; }
       .toolbar-inner  { padding: .55rem 1.2rem; flex-wrap: wrap; }
       .container      { padding: .9rem 1.2rem 1.75rem; }
 
@@ -847,74 +871,58 @@
        PANEL ÚNICO — KPI strip compacto + menú + vista
     ══════════════════════════════════════════════════════ */
 
-    /* KPI STRIP COMPACTO — jerarquía clara: Ventas netas = HERO */
+    /* KPI STRIP — Estilo referencia: barra superior sólida de color + valor coloreado */
     .kpi-strip-compact {
       display: grid;
-      grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr;
-      gap: .6rem;
-      padding: .85rem 1.5rem;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+      gap: .55rem;
+      padding: .55rem 1.5rem;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
     }
     .kc {
-      display: flex; flex-direction: column; gap: .15rem;
-      padding: .7rem .9rem;
-      background: var(--surf2);
+      display: flex; flex-direction: column; gap: .1rem;
+      padding: .55rem .85rem .5rem;
+      background: #fff;
       border: 1px solid var(--border);
+      border-top: 3px solid var(--border2);
       border-radius: var(--r-md);
       position: relative;
       transition: border-color .15s, box-shadow .15s;
     }
-    .kc:hover { border-color: var(--border2); }
+    .kc:hover { box-shadow: 0 2px 8px rgba(15,34,49,.06); }
 
-    /* ── HERO: Ventas netas ── */
-    .kc.ventas {
-      background: linear-gradient(135deg, #2596be 0%, #1a7a9e 100%);
-      border-color: transparent;
-      padding: .85rem 1.1rem;
-      color: #fff;
-    }
-    .kc.ventas::before {
-      content: '';
-      position: absolute; top: 10px; right: 12px;
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #86efac;
-      box-shadow: 0 0 0 3px rgba(134,239,172,.25);
-    }
-    .kc.ventas .kc-lbl { color: rgba(255,255,255,.78); font-size: .58rem; letter-spacing: .12em; }
-    .kc.ventas .kc-val { color: #fff; font-size: 1.45rem; font-weight: 600; font-family: var(--display); letter-spacing: -.02em; }
-    .kc.ventas .kc-sub { color: rgba(255,255,255,.82); }
-    .kc.ventas .kc-sub b { color: #fff; }
-    .kc.ventas .badge { background: rgba(255,255,255,.22); color: #fff; border: 1px solid rgba(255,255,255,.3); }
+    /* ── Color sólido arriba por KPI + valor del mismo color ── */
+    .kc.ventas   { border-top-color: var(--brand); }
+    .kc.ticket   { border-top-color: #6d28d9; }        /* violeta */
+    .kc.unid     { border-top-color: #d97706; }        /* naranja */
+    .kc.comp     { border-top-color: #15803d; }        /* verde */
+    .kc.gar      { border-top-color: var(--gar); }      /* teal */
+    .kc.pol      { border-top-color: var(--pol); }      /* azul profundo */
 
-    /* ── KPIs secundarios: indicador lateral sutil ── */
-    .kc:not(.ventas)::before {
-      content: ''; position: absolute;
-      left: 0; top: 14px; bottom: 14px; width: 2px;
-      border-radius: 2px;
-      opacity: .55;
-    }
-    .kc.ticket::before { background: var(--purple); }
-    .kc.unid::before   { background: var(--teal); }
-    .kc.comp::before   { background: var(--amber); }
-    .kc.gar::before    { background: var(--gar); opacity: .7; }
-    .kc.pol::before    { background: var(--pol); opacity: .7; }
-
-    .kc-lbl {
-      font-size: .56rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .1em; color: var(--muted);
-    }
-    .kc-val {
-      font-family: var(--mono); font-size: 1.05rem; font-weight: 500;
-      color: var(--text); letter-spacing: -.015em; line-height: 1.15;
-    }
+    /* Los valores adoptan el color de su barra superior (estilo referencia) */
+    .kc.ventas .kc-val { color: var(--brand); font-family: var(--display); font-size: 1.25rem; font-weight: 800; letter-spacing: -.02em; }
+    .kc.ticket .kc-val { color: #6d28d9; }
+    .kc.unid   .kc-val { color: #d97706; }
+    .kc.comp   .kc-val { color: #15803d; }
     .kc.gar    .kc-val { color: var(--gar); }
     .kc.pol    .kc-val { color: var(--pol); }
-    .kc-sub {
-      font-size: .6rem; color: var(--muted);
-      display: flex; align-items: center; gap: .3rem; flex-wrap: wrap;
-      margin-top: .1rem;
+
+    .kc-lbl {
+      font-size: .54rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--muted); line-height: 1.2;
     }
+    .kc-val {
+      font-family: var(--display); font-size: .95rem; font-weight: 800;
+      letter-spacing: -.015em; line-height: 1.15;
+      margin-top: 2px;
+    }
+    .kc-sub {
+      font-size: .56rem; color: var(--muted);
+      display: flex; align-items: center; gap: .3rem; flex-wrap: wrap;
+      line-height: 1.25; margin-top: 1px;
+    }
+    .kc-sub b { color: var(--text2); font-weight: 700; }
 
     /* LAYOUT PANEL */
     .panel-layout {
@@ -923,7 +931,7 @@
       overflow: hidden;
     }
 
-    /* MENÚ LATERAL */
+    /* MENÚ LATERAL — estilo píldora referencia */
     .panel-nav {
       width: 210px; flex-shrink: 0;
       background: var(--surface);
@@ -931,34 +939,39 @@
       display: flex; flex-direction: column;
       overflow-y: auto; overflow-x: hidden;
       scrollbar-width: thin;
-      padding: .4rem 0;
+      padding: .5rem .55rem;
     }
     .nav-section-title {
       font-size: .54rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: .14em; color: var(--muted2);
-      padding: .85rem 1.05rem .35rem;
+      padding: .7rem .6rem .35rem;
     }
     .nav-item {
-      display: flex; align-items: center; gap: .65rem;
-      padding: .62rem 1.05rem;
+      display: flex; align-items: center; gap: .6rem;
+      padding: .55rem .75rem;
       cursor: pointer; transition: all .15s;
-      border-left: 3px solid transparent;
-      border-radius: 0;
+      border: 1px solid transparent;
+      border-radius: 999px;
       background: transparent;
-      border-top: none; border-right: none; border-bottom: none;
       font-family: var(--sans); text-align: left; width: 100%;
-      margin: 1px 0;
+      margin: 2px 0;
     }
-    .nav-item:hover { background: var(--surf2); }
-    .nav-item.active {
+    .nav-item:hover {
       background: var(--brandlt);
-      border-left-color: var(--brand3);
+      border-color: var(--brandmd);
     }
-    .nav-icon { font-size: .9rem; flex-shrink: 0; opacity: .75; }
-    .nav-item.active .nav-icon { opacity: 1; }
-    .nav-label { font-size: .72rem; font-weight: 500; color: var(--text2); letter-spacing: -.005em; }
-    .nav-item.active .nav-label { color: var(--brand3); font-weight: 700; }
-    .nav-divider { height: 1px; background: var(--border); margin: .5rem 1.05rem; }
+    .nav-item.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      box-shadow: 0 1px 3px rgba(37,150,190,.25);
+    }
+    .nav-icon { font-size: .95rem; flex-shrink: 0; opacity: .85; }
+    .nav-item:hover .nav-icon { opacity: 1; }
+    .nav-item.active .nav-icon { opacity: 1; filter: brightness(1.15); }
+    .nav-label { font-size: .73rem; font-weight: 600; color: var(--text2); letter-spacing: -.005em; }
+    .nav-item:hover .nav-label { color: var(--brand3); }
+    .nav-item.active .nav-label { color: #fff; font-weight: 700; }
+    .nav-divider { height: 1px; background: var(--border); margin: .5rem .6rem; }
 
     /* ÁREA DE VISTA */
     .panel-view {
@@ -1016,37 +1029,37 @@
       font-family: var(--sans); white-space: nowrap; flex-shrink: 0;
       border-top: 2px solid transparent;
     }
-    .nav-mob-item:hover { background: var(--surf2); }
+    .nav-mob-item:hover { background: var(--brandlt); }
     .nav-mob-item.active {
-      border-top-color: var(--brand3);
+      border-top-color: var(--brand);
       background: var(--brandlt);
     }
     .nav-mob-icon  { font-size: .95rem; opacity: .8; }
     .nav-mob-item.active .nav-mob-icon { opacity: 1; }
     .nav-mob-label { font-size: .58rem; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
-    .nav-mob-item.active .nav-mob-label { color: var(--brand3); font-weight: 700; }
+    .nav-mob-item.active .nav-mob-label { color: var(--brand); font-weight: 700; }
 
     /* KPI strip compacto responsive */
     @media (max-width: 900px) {
       .kpi-strip-compact {
         grid-template-columns: 1fr 1fr 1fr;
-        padding: .65rem 1rem;
+        padding: .55rem 1rem;
         gap: .45rem;
       }
-      .kc.ventas { grid-column: 1 / -1; padding: .8rem 1rem; }
+      .kc.ventas { grid-column: 1 / -1; }
       .kc.ventas .kc-val { font-size: 1.3rem; }
       .kc-val { font-size: .92rem; }
     }
     @media (max-width: 560px) {
       .kpi-strip-compact {
         grid-template-columns: 1fr 1fr;
-        padding: .55rem .9rem;
+        padding: .5rem .9rem;
         gap: .4rem;
       }
-      .kc.ventas { grid-column: 1 / -1; padding: .75rem .9rem; }
-      .kc { padding: .55rem .7rem; }
-      .kc-val { font-size: .86rem; }
-      .kc.ventas .kc-val { font-size: 1.2rem; }
+      .kc.ventas { grid-column: 1 / -1; }
+      .kc { padding: .5rem .7rem .45rem; }
+      .kc-val { font-size: .85rem; }
+      .kc.ventas .kc-val { font-size: 1.15rem; }
     }
 
     /* Panel layout responsive */
@@ -1090,10 +1103,19 @@
       </div>
     </div>
     <div class="hdr-pills">
-      <div class="hpill" id="modePill">Modo empresa</div>
-      <div class="hpill warn hidden" id="demoPill">Sin backend</div>
-      <div class="hpill ok"  id="healthPill">Inicializando</div>
-      <button class="hdr-btn" id="btnRefresh">↻ Actualizar</button>
+      <div class="hdr-chips" id="hdrChips">
+        <div class="hchip">Período: <b id="lblPeriodo">Mes actual</b></div>
+        <div class="hchip">Sucursal: <b id="lblSucursal">Todas</b></div>
+        <div class="hchip">Datos al: <b id="lblFechaDatos">--</b></div>
+        <div class="hchip">Backend: <b id="lblBackend">--</b></div>
+        <div class="hchip warn hidden" id="chipFrescura">⚠ <b id="lblFrescura">--</b></div>
+      </div>
+      <div class="hdr-pills-right">
+        <div class="hpill" id="modePill">Modo empresa</div>
+        <div class="hpill warn hidden" id="demoPill">Sin backend</div>
+        <div class="hpill ok"  id="healthPill">Inicializando</div>
+        <button class="hdr-btn" id="btnRefresh">↻ Actualizar</button>
+      </div>
     </div>
   </div>
 </header>
@@ -1139,14 +1161,10 @@
   </div>
 </div>
 
-<!-- status -->
-<div class="status-bar-wrap" style="background:var(--surface);border-bottom:1px solid var(--border);">
+<!-- status bar legacy (vacío, mantenido para compat con JS que calcula alturas; los chips ahora viven en el header) -->
+<div class="status-bar-wrap" style="display:none">
   <div class="status-bar">
-    <div class="schip">Período: <b id="lblPeriodo">Mes actual</b></div>
-    <div class="schip">Sucursal: <b id="lblSucursal">Todas</b></div>
-    <div class="schip">Datos al: <b id="lblFechaDatos">--</b></div>
-    <div class="schip">Backend: <b id="lblBackend">--</b></div>
-    <div class="schip warn hidden" id="chipFrescura">Datos desactualizados: <b id="lblFrescura">--</b></div>
+    <!-- chips reubicados en el header; se mantienen IDs duplicados ocultos por si algún código los busca -->
   </div>
 </div>
 
@@ -2414,4 +2432,3 @@ init();
 </script>
 </body>
 </html>
-
