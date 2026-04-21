@@ -576,19 +576,29 @@
     .tend.dn  { background: var(--redt);   color: var(--red); }
     .tend.eq  { background: var(--surf3);  color: var(--muted); }
 
-    /* ── ADHERENCIA ─────────────────────────────────────── */
-    .adh-list { display: flex; flex-direction: column; gap: .45rem; padding: .9rem 1rem; }
-    .adh-item { background: var(--surf2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: .7rem .9rem; transition: border-color .15s; }
-    .adh-item:hover { border-color: var(--border2); }
-    .adh-top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; }
-    .adh-name { font-size: .71rem; font-weight: 600; color: var(--text2); }
-    .adh-pct  { font: 700 .72rem var(--mono); color: var(--text); }
-    .adh-bar  { height: 5px; background: var(--border); border-radius: 999px; overflow: hidden; }
-    .adh-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
-    .adh-fill.hi  { background: var(--brand); }
-    .adh-fill.mid { background: var(--amber); }
-    .adh-fill.lo  { background: var(--red); }
-    .adh-val { font-size: .6rem; color: var(--muted); margin-top: .3rem; }
+    /* ── ADHERENCIA (gráfico de barras verticales) ─────────── */
+    .adh-chart-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: .85rem .75rem .6rem;
+      height: 320px;
+      position: relative;
+    }
+    .adh-empty { padding: 1.5rem; text-align: center; color: var(--muted); font-size: .78rem; }
+    .adh-legend {
+      display: flex; gap: .65rem; align-items: center; flex-wrap: wrap;
+      font-size: .6rem; color: var(--muted); font-weight: 600;
+      letter-spacing: .03em;
+    }
+    .adh-legend-item { display: inline-flex; align-items: center; gap: .3rem; }
+    .adh-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+    .adh-dot.hi  { background: var(--brand); }
+    .adh-dot.mid { background: var(--amber); }
+    .adh-dot.lo  { background: var(--red); }
+
+    /* Legacy styles (no usados ya, pero mantenidos por si algo los referencia) */
+    .adh-list { display: none; }
 
     /* ── STOCK ───────────────────────────────────────────── */
     .stock-head {
@@ -752,10 +762,9 @@
       thead th,
       tbody td        { padding: .45rem .55rem; font-size: .67rem; }
 
-      /* adherencia lista */
-      .adh-list       { padding: .55rem .65rem; gap: .3rem; }
-      .adh-item       { padding: .5rem .65rem; }
-      .adh-name       { font-size: .67rem; }
+      /* adherencia — gráfico más bajo en mobile */
+      .adh-chart-wrap { height: 260px; padding: .6rem .5rem .4rem; }
+      .adh-legend     { font-size: .55rem; gap: .5rem; }
 
       /* stock */
       .stock-head     { padding: .6rem .85rem; }
@@ -1257,14 +1266,22 @@
       </div>
       <!-- Adherencia dentro de resumen -->
       <div class="section-label-panel" id="cardAdherencia" style="margin-top:.5rem">Adherencia por sucursal</div>
-      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap">
         <select class="mini-sel" id="objMode">
           <option value="ventas">Ventas</option>
           <option value="garantias">Garantías</option>
           <option value="polizas">Seguros</option>
         </select>
+        <div class="adh-legend">
+          <span class="adh-legend-item"><span class="adh-dot hi"></span>Alta</span>
+          <span class="adh-legend-item"><span class="adh-dot mid"></span>Media</span>
+          <span class="adh-legend-item"><span class="adh-dot lo"></span>Baja</span>
+        </div>
       </div>
-      <div class="adh-list" id="objList"></div>
+      <div class="adh-chart-wrap">
+        <canvas id="objChart"></canvas>
+      </div>
+      <div class="adh-empty hidden" id="objEmpty">Sin datos.</div>
     </div>
 
     <!-- VISTA 2: Semáforo -->
@@ -1967,24 +1984,112 @@ function renderSucursales(){
   }).join('');
 }
 
-/* ── ADHERENCIA ── */
+/* ── ADHERENCIA (gráfico de barras verticales ordenadas desc) ── */
 function renderObjetivos(){
-  if(state.sucursal)return;
-  const mode=document.getElementById('objMode').value;
-  const total=Number(state.resumen?.kpis?.[mode]||0)||0;
-  const rows=safeArr(state.resumen?.sucursales)
+  destroyChart('adh');
+  const emptyEl = document.getElementById('objEmpty');
+  const wrapEl  = document.querySelector('.adh-chart-wrap');
+  const canvas  = document.getElementById('objChart');
+
+  if(state.sucursal){
+    // Si hay filtro de sucursal, no mostrar (como antes)
+    if(wrapEl) wrapEl.classList.add('hidden');
+    if(emptyEl) emptyEl.classList.add('hidden');
+    return;
+  }
+
+  const mode  = document.getElementById('objMode').value;
+  const total = Number(state.resumen?.kpis?.[mode]||0)||0;
+  const rows  = safeArr(state.resumen?.sucursales)
     .map(r=>({sucursal:r.sucursal,valor:Number(r[mode]||0),pct:total?(Number(r[mode]||0)/total)*100:0}))
+    .filter(r=>r.valor>0)
     .sort((a,b)=>b.pct-a.pct);
-  const promPct=rows.length?100/rows.length:3.5;
-  document.getElementById('objList').innerHTML=rows.map(r=>{
-    const level=r.pct>promPct*1.5?'hi':r.pct>promPct*0.7?'mid':'lo';
-    const w=Math.min(100,r.pct*(100/Math.max(promPct*1.6,1)));
-    return`<div class="adh-item">
-      <div class="adh-top"><div class="adh-name">${esc(r.sucursal)}</div><div class="adh-pct">${fmtPct(r.pct)}</div></div>
-      <div class="adh-bar"><div class="adh-fill ${level}" style="width:${w}%"></div></div>
-      <div class="adh-val">${mode}: ${fmtMoney(r.valor)}</div>
-    </div>`;
-  }).join('')||'<div class="empty">Sin datos.</div>';
+
+  if(!rows.length){
+    if(wrapEl) wrapEl.classList.add('hidden');
+    if(emptyEl) emptyEl.classList.remove('hidden');
+    return;
+  }
+  if(wrapEl) wrapEl.classList.remove('hidden');
+  if(emptyEl) emptyEl.classList.add('hidden');
+
+  // Clasificación por nivel (igual que antes): hi/mid/lo relativo al promedio
+  const promPct = rows.length ? 100/rows.length : 3.5;
+  const COL = {
+    hi:  getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()  || '#2596be',
+    mid: getComputedStyle(document.documentElement).getPropertyValue('--amber').trim()  || '#b45309',
+    lo:  getComputedStyle(document.documentElement).getPropertyValue('--red').trim()    || '#b91c1c'
+  };
+  const levelOf = p => p > promPct*1.5 ? 'hi' : p > promPct*0.7 ? 'mid' : 'lo';
+
+  const labels = rows.map(r=>r.sucursal);
+  const values = rows.map(r=>+r.pct.toFixed(2));
+  const colors = rows.map(r=>COL[levelOf(r.pct)]);
+
+  const modeLabel = mode==='ventas' ? 'Ventas'
+                  : mode==='garantias' ? 'Garantías'
+                  : mode==='polizas' ? 'Seguros' : mode;
+
+  state.charts.adh = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: modeLabel + ' (% del total)',
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 4,
+        maxBarThickness: 32,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 8, right: 4, bottom: 0, left: 4 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: items => items.length ? items[0].label : '',
+            label: c => {
+              const row = rows[c.dataIndex];
+              return [
+                `${modeLabel}: ${fmtMoney(row.valor)}`,
+                `% del total: ${fmtPct(row.pct)}`
+              ];
+            }
+          },
+          backgroundColor: 'rgba(11,31,46,.95)',
+          padding: 10,
+          titleFont: { family: 'DM Sans', size: 12, weight: '700' },
+          bodyFont:  { family: 'DM Sans', size: 11 }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            autoSkip: false,
+            maxRotation: 60,
+            minRotation: 45,
+            font: { family: 'DM Sans', size: 9 },
+            color: '#708a9c'
+          },
+          grid: { display: false },
+          border: { color: '#e8edf2' }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            font: { family: 'DM Mono', size: 9 },
+            color: '#708a9c',
+            callback: v => v + '%'
+          },
+          grid: { color: '#f1f4f7', drawTicks: false },
+          border: { display: false }
+        }
+      }
+    }
+  });
 }
 
 /* ── TOP ARTÍCULOS ── */
@@ -2343,6 +2448,7 @@ function bindEvents(){
     const pv = document.getElementById('panelView');
     if (pv) pv.scrollTop = 0;
     // Re-renderizar si la vista tiene gráficos (evita canvas colapsado)
+    if (id === 'insights')  { renderObjetivos(); }
     if (id === 'evolucion') { renderEvolucion(); renderDonut(); }
     if (id === 'ranking')   { renderRankBar(); }
   }
