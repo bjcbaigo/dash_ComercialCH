@@ -578,11 +578,12 @@
 
     /* ── ADHERENCIA (gráfico de barras verticales) ─────────── */
     .adh-chart-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: .85rem .75rem .6rem;
-      height: 320px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      height: 340px;
+      flex: 1;
       position: relative;
     }
     .adh-empty { padding: 1.5rem; text-align: center; color: var(--muted); font-size: .78rem; }
@@ -843,6 +844,21 @@
       .grid-3         { grid-template-columns: 3fr 2fr; }
       .grid-evo       { grid-template-columns: 1fr; }
       .topbot-grid    { grid-template-columns: 1fr 1fr; }
+      /* Insights+adherencia: se mantienen lado a lado pero insights-box más chico */
+      .insights-adh-row { grid-template-columns: minmax(280px, 36%) 1fr; gap: .55rem; }
+    }
+
+    /* Apilar en pantallas medianas/chicas (sidebar + contenido no caben) */
+    @media (max-width: 900px) {
+      .insights-adh-row { grid-template-columns: 1fr; gap: .7rem; }
+      .insights-grid-2x2 { grid-template-columns: 1fr 1fr; }
+      .adh-chart-wrap { height: 300px; }
+    }
+    @media (max-width: 480px) {
+      .insights-grid-2x2 { grid-template-columns: 1fr; gap: .45rem; }
+      .insights-box, .adh-box { padding: .7rem .75rem; }
+      .insights-box-title { font-size: .62rem; letter-spacing: .1em; }
+      .adh-chart-wrap { height: 240px; }
     }
 
     /* ── 1400px — desktop intermedio ── */
@@ -940,7 +956,13 @@
       overflow: hidden;
     }
 
-    /* MENÚ LATERAL — estilo píldora referencia */
+    /* MENÚ LATERAL — colapsable, con auto-retract tras inactividad */
+    .panel-layout {
+      display: flex; gap: 0;
+      height: calc(100vh - var(--hdr-offset, 160px));
+      overflow: hidden;
+      position: relative;
+    }
     .panel-nav {
       width: 210px; flex-shrink: 0;
       background: var(--surface);
@@ -949,11 +971,72 @@
       overflow-y: auto; overflow-x: hidden;
       scrollbar-width: thin;
       padding: .5rem .55rem;
+      transition: width .28s cubic-bezier(.4,0,.2,1);
+      z-index: 20;
+    }
+    /* Estado colapsado: solo íconos */
+    .panel-nav.collapsed {
+      width: 56px;
+      padding: .5rem .35rem;
+    }
+    .panel-nav.collapsed .nav-section-title {
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      transition: opacity .12s;
+    }
+    .panel-nav.collapsed .nav-label {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      transition: opacity .12s, width .12s;
+    }
+    .panel-nav.collapsed .nav-item {
+      padding: .55rem 0;
+      justify-content: center;
+      gap: 0;
+    }
+    .panel-nav.collapsed .nav-divider {
+      margin: .3rem .2rem;
+    }
+    /* Al hover sobre el nav colapsado: expandir como overlay (sin mover el contenido) */
+    .panel-nav.collapsed:hover {
+      width: 210px;
+      padding: .5rem .55rem;
+      box-shadow: 4px 0 16px rgba(15,34,49,.08);
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      height: 100%;
+    }
+    .panel-nav.collapsed:hover .nav-section-title {
+      opacity: 1;
+      height: auto;
+      padding: .7rem .6rem .35rem;
+    }
+    .panel-nav.collapsed:hover .nav-label {
+      opacity: 1;
+      width: auto;
+    }
+    .panel-nav.collapsed:hover .nav-item {
+      padding: .55rem .75rem;
+      justify-content: flex-start;
+      gap: .6rem;
+    }
+    .panel-nav.collapsed:hover .nav-divider {
+      margin: .5rem .6rem;
+    }
+    /* Cuando el nav está colapsado y en overlay, el panel-view no se mueve */
+    .panel-nav.collapsed + .panel-view {
+      margin-left: 0;
     }
     .nav-section-title {
       font-size: .54rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: .14em; color: var(--muted2);
       padding: .7rem .6rem .35rem;
+      white-space: nowrap;
+      transition: opacity .18s, padding .18s;
     }
     .nav-item {
       display: flex; align-items: center; gap: .6rem;
@@ -964,6 +1047,7 @@
       background: transparent;
       font-family: var(--sans); text-align: left; width: 100%;
       margin: 2px 0;
+      white-space: nowrap;
     }
     .nav-item:hover {
       background: var(--brandlt);
@@ -977,10 +1061,14 @@
     .nav-icon { font-size: .95rem; flex-shrink: 0; opacity: .85; }
     .nav-item:hover .nav-icon { opacity: 1; }
     .nav-item.active .nav-icon { opacity: 1; filter: brightness(1.15); }
-    .nav-label { font-size: .73rem; font-weight: 600; color: var(--text2); letter-spacing: -.005em; }
+    .nav-label {
+      font-size: .73rem; font-weight: 600; color: var(--text2); letter-spacing: -.005em;
+      transition: opacity .18s, width .18s;
+    }
     .nav-item:hover .nav-label { color: var(--brand3); }
     .nav-item.active .nav-label { color: #fff; font-weight: 700; }
-    .nav-divider { height: 1px; background: var(--border); margin: .5rem .6rem; }
+    .nav-item.active:hover .nav-label { color: #fff; }
+    .nav-divider { height: 1px; background: var(--border); margin: .5rem .6rem; transition: margin .18s; }
 
     /* ÁREA DE VISTA */
     .panel-view {
@@ -995,24 +1083,86 @@
     .vista { display: none; }
     .vista.active { display: block; }
 
-    /* vista KPIs: grid de insights */
-    .insights-compact {
+    /* ── RESUMEN EJECUTIVO: fila 30/70 (insights + adherencia) ── */
+    .insights-adh-row {
+      display: grid;
+      grid-template-columns: minmax(320px, 32%) 1fr;
+      gap: .7rem;
+      margin-bottom: .75rem;
+      align-items: stretch;
+    }
+
+    /* Caja única de insights (izquierda) */
+    .insights-box,
+    .adh-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: .85rem .95rem;
+      display: flex; flex-direction: column;
+      transition: border-color .15s;
+    }
+    .insights-box:hover,
+    .adh-box:hover { border-color: var(--border2); }
+    .insights-box-title {
+      font-family: var(--display);
+      font-size: .7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--muted);
+      margin-bottom: .7rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Grid 2x2 dentro de la caja de insights */
+    .insights-grid-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: .65rem; margin-bottom: .85rem;
+      gap: .65rem;
+      flex: 1;
     }
+    .ins-cell {
+      display: flex; gap: .55rem; align-items: flex-start;
+      padding: .65rem .7rem;
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      transition: border-color .15s;
+    }
+    .ins-cell:hover { border-color: var(--brandmd); background: var(--brandlt); }
+    .ics-icon { font-size: 1.1rem; flex-shrink: 0; opacity: .85; line-height: 1.1; }
+    .ics-body { min-width: 0; flex: 1; }
+    .ics-label { font-size: .54rem; font-weight: 700; text-transform: uppercase; letter-spacing: .11em; color: var(--muted); }
+    .ics-val   { font-family: var(--display); font-size: .85rem; font-weight: 700; color: var(--text); margin-top: .18rem; letter-spacing: -.005em; line-height: 1.15; word-break: break-word; }
+    .ics-sub   { font-size: .6rem; color: var(--muted); margin-top: 2px; }
+
+    /* Caja de adherencia (derecha) */
+    .adh-box { padding: .85rem .95rem; }
+    .adh-box-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .75rem; flex-wrap: wrap;
+      margin-bottom: .6rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .adh-box-head .insights-box-title {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .adh-controls {
+      display: flex; align-items: center; gap: .65rem; flex-wrap: wrap;
+    }
+
+    /* Compat: estilos viejos (ya no usados en vista insights, pero mantenidos por si algo más los referencia) */
+    .insights-compact { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin-bottom: .85rem; }
     .insight-card-sm {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--r-md); padding: .85rem 1rem;
       display: flex; gap: .7rem; align-items: center;
-      transition: border-color .15s, transform .15s;
+      transition: border-color .15s;
     }
-    .insight-card-sm:hover { border-color: var(--border2); transform: translateY(-1px); }
-    .ics-icon { font-size: 1.15rem; flex-shrink: 0; opacity: .8; }
-    .ics-body {}
-    .ics-label { font-size: .56rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
-    .ics-val   { font-family: var(--display); font-size: .92rem; font-weight: 700; color: var(--text); margin-top: .15rem; letter-spacing: -.005em; }
-    .ics-sub   { font-size: .62rem; color: var(--muted); margin-top: 2px; }
+    .insight-card-sm:hover { border-color: var(--border2); }
 
     /* MOBILE NAV — bottom bar en lugar de sidebar */
     .panel-nav-mobile {
@@ -1258,30 +1408,42 @@
     <div class="vista active" id="vista-insights">
       <div class="section-label-panel">💡 Resumen ejecutivo</div>
       <div class="section-subt-panel">Lectura rápida del período · indicadores clave de atención gerencial</div>
-      <div class="insights-compact">
-        <div class="insight-card-sm"><div class="ics-icon">🏆</div><div class="ics-body"><div class="ics-label">Sucursal líder</div><div class="ics-val" id="insLider">—</div><div class="ics-sub" id="insLiderSub">—</div></div></div>
-        <div class="insight-card-sm"><div class="ics-icon">⚠️</div><div class="ics-body"><div class="ics-label">Sucursal crítica</div><div class="ics-val" id="insCritica">—</div><div class="ics-sub" id="insCriticaSub">—</div></div></div>
-        <div class="insight-card-sm"><div class="ics-icon">📈</div><div class="ics-body"><div class="ics-label">Mayor crecimiento</div><div class="ics-val" id="insCrecimiento">—</div><div class="ics-sub" id="insCrecimientoSub">—</div></div></div>
-        <div class="insight-card-sm"><div class="ics-icon">🎯</div><div class="ics-body"><div class="ics-label">Mejor ticket prom.</div><div class="ics-val" id="insTicket">—</div><div class="ics-sub" id="insTicketSub">—</div></div></div>
-      </div>
-      <!-- Adherencia dentro de resumen -->
-      <div class="section-label-panel" id="cardAdherencia" style="margin-top:.5rem">Adherencia por sucursal</div>
-      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap">
-        <select class="mini-sel" id="objMode">
-          <option value="ventas">Ventas</option>
-          <option value="garantias">Garantías</option>
-          <option value="polizas">Seguros</option>
-        </select>
-        <div class="adh-legend">
-          <span class="adh-legend-item"><span class="adh-dot hi"></span>Alta</span>
-          <span class="adh-legend-item"><span class="adh-dot mid"></span>Media</span>
-          <span class="adh-legend-item"><span class="adh-dot lo"></span>Baja</span>
+
+      <div class="insights-adh-row">
+        <!-- Izquierda: caja única con 4 KPIs en grilla 2x2 -->
+        <div class="insights-box">
+          <div class="insights-box-title">Indicadores clave</div>
+          <div class="insights-grid-2x2">
+            <div class="ins-cell"><div class="ics-icon">🏆</div><div class="ics-body"><div class="ics-label">Sucursal líder</div><div class="ics-val" id="insLider">—</div><div class="ics-sub" id="insLiderSub">—</div></div></div>
+            <div class="ins-cell"><div class="ics-icon">⚠️</div><div class="ics-body"><div class="ics-label">Sucursal crítica</div><div class="ics-val" id="insCritica">—</div><div class="ics-sub" id="insCriticaSub">—</div></div></div>
+            <div class="ins-cell"><div class="ics-icon">📈</div><div class="ics-body"><div class="ics-label">Mayor crecimiento</div><div class="ics-val" id="insCrecimiento">—</div><div class="ics-sub" id="insCrecimientoSub">—</div></div></div>
+            <div class="ins-cell"><div class="ics-icon">🎯</div><div class="ics-body"><div class="ics-label">Mejor ticket prom.</div><div class="ics-val" id="insTicket">—</div><div class="ics-sub" id="insTicketSub">—</div></div></div>
+          </div>
+        </div>
+
+        <!-- Derecha: Adherencia (ocupa ~70% del ancho) -->
+        <div class="adh-box" id="cardAdherencia">
+          <div class="adh-box-head">
+            <div class="insights-box-title">Adherencia por sucursal</div>
+            <div class="adh-controls">
+              <select class="mini-sel" id="objMode">
+                <option value="ventas">Ventas</option>
+                <option value="garantias">Garantías</option>
+                <option value="polizas">Seguros</option>
+              </select>
+              <div class="adh-legend">
+                <span class="adh-legend-item"><span class="adh-dot hi"></span>Alta</span>
+                <span class="adh-legend-item"><span class="adh-dot mid"></span>Media</span>
+                <span class="adh-legend-item"><span class="adh-dot lo"></span>Baja</span>
+              </div>
+            </div>
+          </div>
+          <div class="adh-chart-wrap">
+            <canvas id="objChart"></canvas>
+          </div>
+          <div class="adh-empty hidden" id="objEmpty">Sin datos.</div>
         </div>
       </div>
-      <div class="adh-chart-wrap">
-        <canvas id="objChart"></canvas>
-      </div>
-      <div class="adh-empty hidden" id="objEmpty">Sin datos.</div>
     </div>
 
     <!-- VISTA 2: Semáforo -->
@@ -1998,40 +2160,14 @@ function renderObjetivos(){
     return;
   }
 
-  const mode = document.getElementById('objMode').value;
-  const totalMap = {
-    ventas: Number(state.resumen?.kpis?.ventasNetas || 0),
-    garantias: Number(state.resumen?.kpis?.garantias || 0),
-    polizas: Number(state.resumen?.kpis?.polizas || 0)
-  };
-  const fieldMap = {
-    ventas: 'ventas',
-    garantias: 'garantias',
-    polizas: 'polizas'
-  };
-  const modeLabel = mode==='ventas' ? 'Ventas'
-                  : mode==='garantias' ? 'Garantías'
-                  : mode==='polizas' ? 'Seguros' : mode;
-  const valueField = fieldMap[mode] || mode;
-  let total = totalMap[mode];
-
-  const baseRows = safeArr(state.resumen?.sucursales)
-    .map(r => ({
-      sucursal: r.sucursal,
-      valor: Number(r[valueField] || 0)
-    }))
-    .filter(r => r.valor > 0);
-
-  // Fallback defensivo: si por algún motivo el KPI total no viene, usar suma de sucursales.
-  if(!(total > 0)){
-    total = baseRows.reduce((acc, r) => acc + r.valor, 0);
-  }
-
-  const rows = baseRows
-    .map(r => ({...r, pct: total ? (r.valor / total) * 100 : 0}))
+  const mode  = document.getElementById('objMode').value;
+  const total = Number(state.resumen?.kpis?.[mode]||0)||0;
+  const rows  = safeArr(state.resumen?.sucursales)
+    .map(r=>({sucursal:r.sucursal,valor:Number(r[mode]||0),pct:total?(Number(r[mode]||0)/total)*100:0}))
+    .filter(r=>r.valor>0)
     .sort((a,b)=>b.pct-a.pct);
 
-  if(!rows.length || !(total > 0)){
+  if(!rows.length){
     if(wrapEl) wrapEl.classList.add('hidden');
     if(emptyEl) emptyEl.classList.remove('hidden');
     return;
@@ -2051,6 +2187,10 @@ function renderObjetivos(){
   const labels = rows.map(r=>r.sucursal);
   const values = rows.map(r=>+r.pct.toFixed(2));
   const colors = rows.map(r=>COL[levelOf(r.pct)]);
+
+  const modeLabel = mode==='ventas' ? 'Ventas'
+                  : mode==='garantias' ? 'Garantías'
+                  : mode==='polizas' ? 'Seguros' : mode;
 
   state.charts.adh = new Chart(canvas, {
     type: 'bar',
@@ -2550,10 +2690,65 @@ function bindEvents(){
   document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){state.search=e.target.value.trim();refreshAll();}});
 }
 
+/* ── SIDEBAR AUTO-COLAPSABLE ── */
+function setupSidebarAutoCollapse(){
+  const nav = document.querySelector('.panel-nav');
+  if(!nav) return;
+
+  const IDLE_MS = 4000;
+  let idleTimer = null;
+
+  function resizeCharts(){
+    // Chart.js con responsive:true redimensiona solo, pero forzamos por si el
+    // contenedor cambió rápidamente (colapso/expand del sidebar)
+    Object.values(state.charts || {}).forEach(c => { try { c && c.resize && c.resize(); } catch(e){} });
+  }
+
+  function scheduleCollapse(){
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(()=>{
+      if(window.innerWidth > 768){
+        nav.classList.add('collapsed');
+        // Esperar a que termine la transición CSS (.28s) y forzar re-dibujo
+        setTimeout(resizeCharts, 320);
+      }
+    }, IDLE_MS);
+  }
+
+  function resetTimer(){
+    const wasCollapsed = nav.classList.contains('collapsed');
+    nav.classList.remove('collapsed');
+    if(wasCollapsed){
+      setTimeout(resizeCharts, 320);
+    }
+    scheduleCollapse();
+  }
+
+  // Disparadores para resetear (actividad en cualquier parte del documento)
+  ['mousemove','mousedown','keydown','touchstart','scroll'].forEach(evt=>{
+    document.addEventListener(evt, resetTimer, { passive: true, capture: false });
+  });
+
+  // Click dentro del nav = interacción explícita
+  nav.addEventListener('click', resetTimer);
+
+  // Hover sobre el nav: pausar el auto-colapso mientras el cursor esté ahí
+  nav.addEventListener('mouseenter', ()=>{
+    clearTimeout(idleTimer);
+  });
+  nav.addEventListener('mouseleave', ()=>{
+    scheduleCollapse();
+  });
+
+  // Inicial: programar colapso
+  scheduleCollapse();
+}
+
 function init(){
   bindEvents();
   if(state.sucursal)document.getElementById('searchInput').placeholder='Buscar SKU en la sucursal';
   populateSucursalOptions(true);
+  setupSidebarAutoCollapse();
   refreshAll();
 }
 init();
