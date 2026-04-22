@@ -2161,8 +2161,13 @@ function renderObjetivos(){
   }
 
   const mode  = document.getElementById('objMode').value;
-  const total = Number(state.resumen?.kpis?.[mode]||0)||0;
-  const rows  = safeArr(state.resumen?.sucursales)
+
+  // Mapeo mode → clave en sucursales (todas coinciden: ventas/garantias/polizas)
+  // Evitamos leer de kpis porque ahí "ventas" se llama "ventasNetas" (inconsistencia legacy)
+  const sucs  = safeArr(state.resumen?.sucursales);
+  const total = sucs.reduce((acc, r) => acc + (Number(r[mode]||0) || 0), 0);
+
+  const rows  = sucs
     .map(r=>({sucursal:r.sucursal,valor:Number(r[mode]||0),pct:total?(Number(r[mode]||0)/total)*100:0}))
     .filter(r=>r.valor>0)
     .sort((a,b)=>b.pct-a.pct);
