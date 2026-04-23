@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      /* ── Fondos: más neutros y respirados ── */
+      /* ── Fondos: modo claro ── */
       --bg:       #f4f6f9;
       --surface:  #ffffff;
       --surf2:    #fafbfc;
@@ -19,17 +19,21 @@
       --border:   #e8edf2;
       --border2:  #d8e0e8;
 
-      /* ── CHEMES brand (misma identidad, matices) ── */
+      /* ── CHEMES brand ── */
       --brand:    #2596be;
       --brand2:   #1a7a9e;
       --brand3:   #0f5c7a;
-      --brand4:   #083d56;          /* nuevo: azul profundo para hero */
+      --brand4:   #083d56;
       --brandlt:  #eff7fb;
       --brandmd:  #cde6f0;
 
-      /* ── Acentos: desaturados, tono más sobrio ── */
+      /* ── Cyan/teal como acento secundario (inspirado en las capturas) ── */
+      --cyan:     #06b6d4;
+      --cyanlt:   #ecfeff;
       --teal:     #0f9488;
       --tealt:    #e8f5f3;
+
+      /* ── Acentos ── */
       --green:    #15803d;
       --greent:   #e7f5ec;
       --red:      #b91c1c;
@@ -44,7 +48,7 @@
       --pol:      #1e40af;
       --polt:     #e4eafb;
 
-      /* ── Texto: alto contraste donde importa ── */
+      /* ── Texto ── */
       --text:     #0b1f2e;
       --text2:    #35505f;
       --muted:    #708a9c;
@@ -59,10 +63,133 @@
       --r-lg:     14px;
       --r-xl:     18px;
 
-      /* ── Sombras más discretas ── */
       --sh-sm:    0 1px 2px rgba(15,34,49,.04);
       --sh-md:    0 2px 6px rgba(15,34,49,.06), 0 1px 2px rgba(15,34,49,.03);
       --sh-lg:    0 6px 18px rgba(15,34,49,.08), 0 2px 6px rgba(15,34,49,.04);
+
+      /* header bg separado para overridear en dark */
+      --hdr-bg:   linear-gradient(135deg, #2596be 0%, #1a7a9e 100%);
+      --hdr-shadow: 0 1px 0 rgba(0,0,0,.04), 0 4px 14px rgba(37,150,190,.22);
+
+      /* overlay loading */
+      --overlay-bg: rgba(255,255,255,.72);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       TEMA OSCURO
+    ══════════════════════════════════════════════════════ */
+    [data-theme="dark"] {
+      --bg:       #0c1a24;
+      --surface:  #13242f;
+      --surf2:    #172d3a;
+      --surf3:    #1c3545;
+      --border:   #243d4e;
+      --border2:  #2e5063;
+
+      --brandlt:  rgba(37,150,190,.12);
+      --brandmd:  rgba(37,150,190,.25);
+
+      --cyanlt:   rgba(6,182,212,.1);
+      --tealt:    rgba(15,148,136,.1);
+      --greent:   rgba(21,128,61,.12);
+      --redt:     rgba(185,28,28,.12);
+      --ambert:   rgba(180,83,9,.12);
+      --purplet:  rgba(109,40,217,.12);
+      --gart:     rgba(15,118,110,.12);
+      --polt:     rgba(30,64,175,.12);
+
+      --text:     #e8eef2;
+      --text2:    #b0c5d4;
+      --muted:    #708a9c;
+      --muted2:   #4a6272;
+
+      --sh-sm:    0 1px 2px rgba(0,0,0,.2);
+      --sh-md:    0 2px 6px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.15);
+      --sh-lg:    0 6px 18px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.2);
+
+      --hdr-bg:   linear-gradient(135deg, #0a2e42 0%, #0f4a66 100%);
+      --hdr-shadow: 0 1px 0 rgba(0,0,0,.15), 0 4px 14px rgba(0,0,0,.3);
+
+      --overlay-bg: rgba(12,26,36,.82);
+    }
+    /* Dark mode overrides para elementos con colores inline */
+    [data-theme="dark"] header {
+      background: var(--hdr-bg);
+      box-shadow: var(--hdr-shadow);
+    }
+    [data-theme="dark"] .logo-mark {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.15);
+    }
+    [data-theme="dark"] .toolbar-wrap {
+      background: var(--surface);
+      border-bottom-color: var(--border);
+    }
+    [data-theme="dark"] .period-strip {
+      background: var(--surf3);
+    }
+    [data-theme="dark"] .ptab.active {
+      background: var(--brand);
+      color: #fff;
+    }
+    [data-theme="dark"] .kc {
+      background: var(--surface);
+    }
+    [data-theme="dark"] .kc.ventas {
+      border-top-color: var(--cyan);
+    }
+    [data-theme="dark"] .kc.ventas .kc-val { color: var(--cyan); }
+    [data-theme="dark"] .loading-overlay {
+      background: var(--overlay-bg);
+      backdrop-filter: blur(2px);
+    }
+    [data-theme="dark"] .loading-overlay-text { color: var(--cyan); }
+    [data-theme="dark"] .custom-range {
+      background: var(--surf2); border-bottom-color: var(--border);
+    }
+    [data-theme="dark"] .cr-input {
+      background: var(--surface); border-color: var(--border); color: var(--text);
+    }
+    [data-theme="dark"] .status-bar-wrap { background: var(--surface) !important; border-color: var(--border) !important; }
+    [data-theme="dark"] .sema-card .sema-val { color: var(--text); }
+    [data-theme="dark"] .stock-head {
+      background: var(--surface);
+      border-bottom-color: var(--border);
+    }
+    /* Chart.js canvas en dark: se invierte poco, los fondos transparentes funcionan bien */
+    [data-theme="dark"] canvas { filter: none; }
+    /* Transición suave al cambiar de tema */
+    html { transition: background .3s, color .3s; }
+    body, .toolbar-wrap, .kpi-strip-compact, .panel-view, .panel-nav-mobile,
+    .card, .evo-box, .insights-box, .adh-box, .sema-card, .tb-card, .ss-tile,
+    .insight-card-sm, .ins-cell, .stock-item, .adh-chart-wrap,
+    .kc, .evo-kpi, .dl-item, .adh-item {
+      transition: background .3s, border-color .3s, color .3s;
+    }
+
+    /* ── Toggle claro/oscuro — pill tipo iOS ── */
+    .theme-toggle {
+      display: inline-flex;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 1px;
+    }
+    .theme-opt {
+      border: none; background: transparent;
+      padding: .25rem .55rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: .72rem; line-height: 1;
+      color: rgba(255,255,255,.7);
+      transition: all .18s;
+    }
+    .theme-opt:hover { color: #fff; }
+    .theme-opt.active {
+      background: rgba(255,255,255,.22);
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.12);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -80,9 +207,9 @@
     /* ── HEADER ─────────────────────────────────────────── */
     header {
       position: sticky; top: 0; z-index: 100;
-      background: linear-gradient(135deg, #2596be 0%, #1a7a9e 100%);
+      background: var(--hdr-bg);
       border-bottom: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 4px 14px rgba(37,150,190,.22);
+      box-shadow: var(--hdr-shadow);
     }
     .hdr-inner {
       max-width: 1800px; margin: 0 auto;
@@ -989,7 +1116,7 @@
     .loading-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(255, 255, 255, .72);
+      background: var(--overlay-bg);
       backdrop-filter: blur(1.5px);
       -webkit-backdrop-filter: blur(1.5px);
       display: flex; flex-direction: column;
@@ -1609,6 +1736,11 @@
         <div class="hchip warn hidden" id="chipFrescura">⚠ <b id="lblFrescura">--</b></div>
       </div>
       <div class="hdr-pills-right">
+        <!-- Toggle tema claro/oscuro tipo pill iOS -->
+        <div class="theme-toggle" id="themeToggle" title="Cambiar tema claro/oscuro">
+          <button class="theme-opt active" data-theme="light">☀</button>
+          <button class="theme-opt" data-theme="dark">🌙</button>
+        </div>
         <div class="hpill" id="modePill">Modo empresa</div>
         <div class="hpill warn hidden" id="demoPill">Sin backend</div>
         <div class="hpill ok"  id="healthPill">Inicializando</div>
@@ -2950,15 +3082,25 @@ function renderStock(){
 
 /* ── CHART OPTIONS ── */
 function baseChartOptions({currency=false}={}){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const tickColor = isDark ? '#708a9c' : '#9ab0bf';
+  const gridColor = isDark ? 'rgba(100,160,200,.08)' : 'rgba(150,180,200,.1)';
+  const tooltipBg = isDark ? 'rgba(20,45,60,.95)' : 'rgba(11,31,46,.95)';
   return{
     responsive:true,maintainAspectRatio:false,
     plugins:{
       legend:{display:false},
-      tooltip:{callbacks:{label:c=>currency?fmtMoneyFull(c.raw):fmtNum(c.raw)}}
+      tooltip:{
+        callbacks:{label:c=>currency?fmtMoneyFull(c.raw):fmtNum(c.raw)},
+        backgroundColor: tooltipBg,
+        padding: 10,
+        titleFont: { family:'DM Sans', size: 12, weight:'700' },
+        bodyFont:  { family:'DM Sans', size: 11 }
+      }
     },
     scales:{
-      x:{ticks:{color:'#9ab0bf',maxRotation:45,autoSkip:true,maxTicksLimit:14,font:{size:10}},grid:{display:false}},
-      y:{ticks:{color:'#9ab0bf',callback:v=>currency?fmtMoney(v):fmtNum(v),font:{size:10}},grid:{color:'rgba(150,180,200,.1)'}}
+      x:{ticks:{color:tickColor,maxRotation:45,autoSkip:true,maxTicksLimit:14,font:{size:10,family:'DM Sans'}},grid:{display:false},border:{color:isDark?'#2e5063':'#e8edf2'}},
+      y:{ticks:{color:tickColor,callback:v=>currency?fmtMoney(v):fmtNum(v),font:{size:10,family:'DM Mono'}},grid:{color:gridColor,drawTicks:false},border:{display:false}}
     }
   };
 }
@@ -3360,7 +3502,53 @@ function bindEvents(){
   document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){state.search=e.target.value.trim();refreshAll();}});
 }
 
+/* ── THEME TOGGLE (claro/oscuro) ── */
+function setupThemeToggle(){
+  const toggle = document.getElementById('themeToggle');
+  if(!toggle) return;
+
+  // Leer tema guardado o preferencia del sistema
+  const saved = localStorage.getItem('chemes-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initial = saved || (prefersDark ? 'dark' : 'light');
+  applyTheme(initial);
+
+  // Clicks en los botones del pill
+  toggle.querySelectorAll('.theme-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyTheme(btn.dataset.theme);
+    });
+  });
+}
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('chemes-theme', theme);
+
+  // Actualizar botones del pill
+  const toggle = document.getElementById('themeToggle');
+  if(toggle){
+    toggle.querySelectorAll('.theme-opt').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+  }
+
+  // Re-renderizar charts (Chart.js usa colores del canvas que no cambian con CSS vars)
+  // Los charts se re-dibujan con los colores de JS, no de CSS, así que regeneramos
+  // los que estén activos (solo si ya tenemos datos cargados)
+  if(state.resumen){
+    const activeVista = document.querySelector('.vista.active');
+    if(activeVista){
+      const id = activeVista.id.replace('vista-','');
+      if(id === 'insights')  setTimeout(renderObjetivos, 50);
+      if(id === 'evolucion') { setTimeout(renderEvolucion, 50); setTimeout(renderDonut, 80); }
+      if(id === 'ranking')   setTimeout(renderRankBar, 50);
+    }
+  }
+}
+
 function init(){
+  setupThemeToggle();
   bindEvents();
   if(state.sucursal)document.getElementById('searchInput').placeholder='Buscar SKU en la sucursal';
   populateSucursalOptions(true);
