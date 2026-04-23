@@ -1155,6 +1155,13 @@
     }
     .vista.active { animation: viewFadeIn .22s ease-out; }
 
+    /* Flash de confirmación al re-renderizar un chart (feedback instantáneo) */
+    @keyframes chartFlash {
+      0%   { opacity: .4; }
+      100% { opacity: 1; }
+    }
+    .chart-refreshing { animation: chartFlash .35s ease-out; }
+
     /* Select deshabilitado mientras carga */
     .tb-select:disabled,
     .tb-input:disabled,
@@ -2730,6 +2737,14 @@ function renderEvolucion(){
   const g = { daily:'Diaria', weekly:'Semanal', monthly:'Mensual' };
   document.getElementById('evoSubt').textContent = `${labelMap[state.seriEvo]} · Evolución ${g[state.group]||'diaria'}`;
 
+  // Flash visual de confirmación del re-render
+  const chartWrap = document.querySelector('.evo-chart-wrap');
+  if(chartWrap){
+    chartWrap.classList.remove('chart-refreshing');
+    void chartWrap.offsetWidth; // force reflow to restart animation
+    chartWrap.classList.add('chart-refreshing');
+  }
+
   // KPIs de contexto
   updateEvoKpis(grouped, evoPrev);
 }
@@ -3468,10 +3483,24 @@ function bindEvents(){
     }
     refreshAll();
   }));
-  document.getElementById('groupSel').addEventListener('change',e=>{state.group=e.target.value;renderEvolucion();});
+  document.getElementById('groupSel').addEventListener('change',e=>{
+    state.group=e.target.value;
+    // Si no estamos en evolución, llevar al usuario allá para que vea el cambio
+    const vistaActiva = document.querySelector('.vista.active');
+    if(!vistaActiva || vistaActiva.id !== 'vista-evolucion'){
+      switchVista('evolucion');
+    } else {
+      renderEvolucion();
+    }
+  });
   document.querySelectorAll('#evoToggle .ttab').forEach(btn=>btn.addEventListener('click',()=>{
     document.querySelectorAll('#evoToggle .ttab').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');state.seriEvo=btn.dataset.serie;renderEvolucion();
+    btn.classList.add('active');state.seriEvo=btn.dataset.serie;
+    renderEvolucion();
+    updateEvoKpis(
+      aggregateEvolution(safeArr(state.resumen?.evolucion), state.group, state.seriEvo),
+      safeArr(state.resumenPrev?.evolucion)
+    );
   }));
   const evoCompareChk = document.getElementById('evoCompareChk');
   if(evoCompareChk) evoCompareChk.addEventListener('change', renderEvolucion);
